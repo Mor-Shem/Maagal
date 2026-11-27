@@ -1,0 +1,1821 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F6E9E6">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="מעגל">
+<title>מעגל · ניהול מנטורינג</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Frank+Ruhl+Libre:wght@400;500;700&display=swap" rel="stylesheet" crossorigin>
+<style>
+:root{
+  --bg:#FAF6F3; --bg-2:#F4ECE7; --surface:#FFFFFF;
+  --ink:#3B2B36; --ink-2:#5E4A57; --muted:#8C7A84;
+  --line:#EADFD9; --line-2:#F3EBE6;
+  --plum:#5E3B54; --plum-d:#4A2E42;
+  --rose:#B9787F; --rose-d:#9C5E67; --rose-s:#F5E3E1;
+  --gold:#B08D57; --gold-s:#F3EADB;
+  --sage:#7E9A7E; --sage-s:#E6EEE4;
+  --shadow:0 1px 2px rgba(94,59,84,.05),0 8px 26px rgba(94,59,84,.07);
+  --r:18px;
+  --serif:'Frank Ruhl Libre','David','Times New Roman',serif;
+  --sans:'Assistant','Segoe UI',Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15.5px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body.noscroll{overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--rose-d)}
+.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---------- layout ---------- */
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;padding:28px 18px;background:linear-gradient(185deg,#F6E9E6 0%,#F2E7EC 55%,#EEE8F2 100%);border-inline-end:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px;padding:2px 10px 28px}
+.brand h1{font-family:var(--serif);font-weight:500;font-size:31px;margin:0;color:var(--plum);line-height:1}
+.brand p{margin:5px 0 0;font-size:12.5px;color:var(--muted);letter-spacing:.2px}
+.nav a{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:13px;color:var(--ink-2);text-decoration:none;font-weight:500;margin-bottom:4px;transition:background .15s,box-shadow .15s}
+.nav a:hover{background:rgba(255,255,255,.6)}
+.nav a.on{background:#fff;color:var(--plum);box-shadow:var(--shadow);font-weight:600}
+.nav a.on .i{stroke:var(--rose)}
+.nav .badge{margin-inline-start:auto;font-size:12px;background:rgba(94,59,84,.08);color:var(--ink-2);border-radius:99px;padding:0 8px}
+.side-foot{position:absolute;bottom:22px;inset-inline:18px;font-size:12.5px;color:var(--muted);padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.5)}
+.side-foot b{display:block;color:var(--plum);font-weight:600;font-size:13px;margin-bottom:2px}
+.main{padding:36px 46px 70px;max-width:1260px;width:100%}
+
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:26px;flex-wrap:wrap}
+.ph h2{font-family:var(--serif);font-weight:500;font-size:36px;margin:0;color:var(--plum);line-height:1.15}
+.ph .sub{color:var(--muted);margin-top:6px;max-width:640px}
+.eyebrow{font-size:13px;color:var(--rose-d);font-weight:600;letter-spacing:.3px;margin-bottom:4px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:22px 24px}
+.card h3,.sec{font-family:var(--serif);font-weight:500;font-size:20px;margin:0 0 14px;color:var(--plum);display:flex;align-items:center;gap:8px}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.tight{gap:0 14px}
+.mt{margin-top:16px}.mt0{margin-top:0}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.end{justify-content:flex-end}
+.muted{color:var(--muted)}
+.sm{font-size:13.5px}
+
+/* ---------- controls ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:999px;padding:10px 20px;font-weight:600;cursor:pointer;background:var(--plum);color:#fff;transition:background .15s,transform .15s;text-decoration:none;white-space:nowrap;font-size:15px}
+.btn:hover{background:var(--plum-d);transform:translateY(-1px)}
+.btn.soft{background:var(--rose-s);color:var(--plum)}
+.btn.soft:hover{background:#EFD5D2}
+.btn.ghost{background:transparent;color:var(--ink-2);box-shadow:inset 0 0 0 1px var(--line)}
+.btn.ghost:hover{background:var(--bg-2)}
+.btn.danger{background:#F6E0E0;color:#963C47}
+.btn.danger:hover{background:#F0CFD0}
+.btn.sm{padding:6px 14px;font-size:13.5px}
+.btn .i{width:17px;height:17px}
+.f{width:100%;border:1px solid var(--line);background:#FFFCFB;border-radius:12px;padding:10px 14px;outline:none;transition:border-color .15s,box-shadow .15s}
+.f:focus{border-color:var(--rose);box-shadow:0 0 0 4px rgba(185,120,127,.14);background:#fff}
+textarea.f{resize:vertical;min-height:110px;line-height:1.65}
+textarea.big{min-height:240px}
+select.f{cursor:pointer}
+.l{display:block;font-size:13.5px;font-weight:600;color:var(--ink-2);margin:0 0 6px}
+.l small{font-weight:400;color:var(--muted)}
+.field{margin-bottom:14px}
+.chk{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--ink-2);cursor:pointer}
+.chk input{accent-color:var(--rose-d);width:16px;height:16px}
+.seg{display:inline-flex;background:var(--bg-2);border-radius:999px;padding:4px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:6px 15px;border-radius:999px;cursor:pointer;color:var(--ink-2);font-weight:500;font-size:14px}
+.seg button.on{background:#fff;box-shadow:0 1px 4px rgba(94,59,84,.12);color:var(--plum);font-weight:600}
+.note{background:var(--gold-s);color:#6E5530;border-radius:12px;padding:10px 14px;font-size:14px;margin-bottom:16px}
+.note.ok{background:var(--sage-s);color:#456145}
+.hint{font-size:13px;margin-top:6px;color:var(--muted)}
+.hint.ok{color:#4F6B4F}
+.link{border:0;background:none;color:var(--rose-d);cursor:pointer;padding:0;font-weight:600;font-size:13.5px}
+
+/* ---------- tags ---------- */
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{display:inline-flex;align-items:center;gap:3px;padding:2px 11px;border-radius:999px;font-size:13px;font-weight:500;white-space:nowrap;line-height:1.7;border:1px solid transparent}
+.tag.click,[data-act].tag{cursor:pointer}
+.tag .x{border:0;background:none;padding:0 3px;margin-inline-start:2px;cursor:pointer;opacity:.5;font-size:16px;line-height:1;color:inherit}
+.tag .x:hover{opacity:1}
+.tag .cnt{font-style:normal;font-size:11.5px;opacity:.65;margin-inline-start:4px}
+.tag.must{border-color:currentColor;font-weight:700}
+.tag.miss{background:transparent!important;border:1px dashed #D9CBC5;color:var(--muted)!important}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.c-rose{background:#F5E3E1;color:#8E4D57}  .dot.c-rose{background:#C98E95}
+.c-sage{background:#E5EDE3;color:#4F6B4F}  .dot.c-sage{background:#8FAA8D}
+.c-gold{background:#F3EADB;color:#7E6235}  .dot.c-gold{background:#C2A574}
+.c-lav{background:#ECE7F3;color:#5E4E7E}   .dot.c-lav{background:#A495C0}
+.c-sky{background:#E2EBF1;color:#45657C}   .dot.c-sky{background:#8EABBF}
+.c-peach{background:#F8E7DD;color:#8A5537} .dot.c-peach{background:#D8A585}
+.c-mint{background:#DDEEEA;color:#3E6E64}  .dot.c-mint{background:#86B8AC}
+.c-stone{background:#EEEAE7;color:#625A55} .dot.c-stone{background:#ABA29C}
+
+.tp{display:flex;flex-wrap:wrap;gap:6px;align-items:center;border:1px solid var(--line);background:#FFFCFB;border-radius:12px;padding:6px 8px;min-height:44px;transition:border-color .15s,box-shadow .15s}
+.tp:focus-within{border-color:var(--rose);box-shadow:0 0 0 4px rgba(185,120,127,.14);background:#fff}
+.tp-wrap{position:relative;flex:1;min-width:170px}
+.tp-in{border:0;outline:0;background:transparent;width:100%;padding:4px 6px}
+.tp-dd{position:absolute;top:calc(100% + 8px);inset-inline-start:-8px;width:min(330px,80vw);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 14px 34px rgba(59,43,54,.16);z-index:40;padding:6px;max-height:310px;overflow:auto}
+.tp-opt{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:9px;cursor:pointer;font-size:14px}
+.tp-opt small{margin-inline-start:auto;color:var(--muted);font-size:12px}
+.tp-opt.hi{background:var(--bg-2)}
+.tp-opt.create{color:var(--rose-d)}
+
+/* ---------- avatars & kinds ---------- */
+.av{width:44px;height:44px;border-radius:50%;display:inline-grid;place-items:center;font-weight:700;font-size:15px;flex:none;letter-spacing:.5px}
+.av.sm{width:34px;height:34px;font-size:13px}
+.av.lg{width:68px;height:68px;font-size:23px;font-family:var(--serif);font-weight:500}
+.kind{font-size:12px;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.k-mentee{background:#F5E3E1;color:#8E4D57}
+.k-mentor{background:#F3EADB;color:#7E6235}
+.k-contact{background:#E2EBF1;color:#45657C}
+
+/* ---------- dashboard ---------- */
+.stat{position:relative;overflow:hidden}
+.stat .n{font-family:var(--serif);font-size:42px;line-height:1;color:var(--plum)}
+.stat .lbl{color:var(--muted);margin-top:8px;font-size:14px}
+.stat::after{content:'';position:absolute;width:120px;height:120px;border-radius:50%;inset-inline-end:-38px;top:-44px;opacity:.55}
+.stat.rose::after{background:var(--rose-s)} .stat.gold::after{background:var(--gold-s)}
+.stat.sage::after{background:var(--sage-s)} .stat.lav::after{background:#ECE7F3}
+.list .it{display:flex;align-items:center;gap:12px;padding:11px 8px;border-bottom:1px solid var(--line-2);cursor:pointer;border-radius:10px}
+.list .it:last-child{border-bottom:0}
+.list .it:hover{background:var(--bg)}
+.list .it .grow{flex:1;min-width:0}
+.list .it .t1{font-weight:600}
+.list .it .t2{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:12.5px;font-weight:600;border-radius:999px;padding:2px 10px;white-space:nowrap;background:var(--bg-2);color:var(--ink-2)}
+.pill.late{background:#F6E0E0;color:#963C47}
+.pill.today{background:var(--gold-s);color:#7E6235}
+.empty{color:var(--muted);text-align:center;padding:26px 10px;font-size:14.5px}
+
+/* ---------- people ---------- */
+.filters .search{flex:1;min-width:240px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:18px}
+.pcard{cursor:pointer;transition:transform .15s,box-shadow .15s,border-color .15s;display:flex;flex-direction:column;gap:12px;padding:20px}
+.pcard:hover{transform:translateY(-2px);border-color:#E7CFCB;box-shadow:0 2px 4px rgba(94,59,84,.05),0 14px 30px rgba(94,59,84,.10)}
+.pcard .top{display:flex;gap:12px;align-items:center}
+.pcard .who{flex:1;min-width:0}
+.pcard .nm{font-weight:700;font-size:16.5px}
+.pcard .rl{color:var(--muted);font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pcard .meta{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px;margin-top:auto}
+.pcard .meta .due{color:#963C47;font-weight:600}
+
+/* ---------- person modal ---------- */
+.phead{display:flex;gap:18px;align-items:center;margin-bottom:18px}
+.phead h2{font-family:var(--serif);font-weight:500;font-size:30px;margin:0;color:var(--plum);line-height:1.1}
+.phead .rl{color:var(--muted);margin-top:4px}
+.contact{margin-top:8px;font-size:14px}
+.contact a{display:inline-flex;align-items:center;gap:5px;text-decoration:none;color:var(--ink-2);background:var(--bg-2);padding:3px 11px;border-radius:999px}
+.contact a:hover{background:var(--rose-s)}
+.contact .i{width:15px;height:15px}
+.tl{position:relative;padding-inline-start:24px;margin-top:6px}
+.tl::before{content:'';position:absolute;inset-inline-start:6px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.tli{position:relative;margin-bottom:16px;background:var(--bg);border-radius:14px;padding:14px 16px}
+.tli::before{content:'';position:absolute;inset-inline-start:-23px;top:19px;width:10px;height:10px;border-radius:50%;background:#fff;border:2.5px solid var(--rose)}
+.tl-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.tl-h b{font-size:15.5px}
+.tl-h .muted{font-size:13px}
+.tl-h .del{margin-inline-start:auto}
+.tli .txt{white-space:pre-wrap;color:var(--ink-2);font-size:14.5px;margin:8px 0;max-height:7.2em;overflow:hidden}
+.tli.open .txt{max-height:none}
+.atts{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.atts img{width:84px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line);cursor:zoom-in}
+.icon-btn{border:0;background:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:8px;display:inline-grid;place-items:center}
+.icon-btn:hover{background:var(--rose-s);color:#963C47}
+
+/* ---------- intake ---------- */
+.intake{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--rose-s);color:var(--rose-d);font-family:var(--sans);font-size:14px;font-weight:700}
+.drop{border:1.5px dashed #DCC6C3;border-radius:16px;padding:20px;text-align:center;background:#FFFBFA;color:var(--muted);cursor:pointer;margin-top:14px;transition:background .15s,border-color .15s}
+.drop:hover,.drop.over{border-color:var(--rose);background:var(--rose-s)}
+.drop .i{width:28px;height:28px;stroke:var(--rose);margin-bottom:4px}
+.drop b{color:var(--ink-2)}
+.drop small{display:block;margin-top:6px;font-size:12.5px;line-height:1.6}
+.files{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.fth{position:relative;width:132px;background:var(--bg);border-radius:12px;padding:6px;font-size:12px;color:var(--muted)}
+.fth img{width:100%;height:78px;object-fit:cover;border-radius:8px;display:block}
+.fth .fst{margin-top:5px;line-height:1.35}
+.fth .x{position:absolute;top:2px;inset-inline-end:2px;width:22px;height:22px;border-radius:50%;border:0;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15);cursor:pointer;line-height:1}
+.bar{display:block;height:5px;background:var(--line);border-radius:9px;overflow:hidden;margin-bottom:4px}
+.bar i{display:block;height:100%;background:var(--rose);width:0;transition:width .2s}
+.howto{display:grid;gap:14px;margin:6px 0 20px}
+.hstep{display:flex;gap:12px}
+.hstep>span{width:38px;height:38px;border-radius:12px;background:var(--rose-s);color:var(--rose-d);display:grid;place-items:center;flex:none}
+.hstep p{margin:2px 0 0;color:var(--muted);font-size:14px}
+
+/* ---------- match ---------- */
+.res{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:18px;align-items:start;margin-top:14px;position:relative}
+.res.best{border-color:#E7CFCB;background:linear-gradient(180deg,#FFFBFA,#fff)}
+.ribbon{position:absolute;top:-11px;inset-inline-start:22px;background:var(--plum);color:#fff;font-size:12px;font-weight:600;border-radius:99px;padding:2px 12px}
+.ring{--p:0;--rc:var(--rose);width:66px;height:66px;border-radius:50%;background:conic-gradient(var(--rc) calc(var(--p) * 1%),var(--bg-2) 0);display:grid;place-items:center}
+.ring span{width:52px;height:52px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:700;color:var(--plum);font-size:15px}
+.res .nm{font-weight:700;font-size:17px}
+.res .why{color:var(--ink-2);font-size:14px;margin:6px 0 10px}
+.snip{margin-top:10px;font-size:14px;color:var(--ink-2);background:var(--bg);border-radius:12px;padding:9px 13px;border-inline-start:3px solid var(--rose-s)}
+mark{background:#F6E3C8;color:inherit;border-radius:4px;padding:0 2px}
+.acts{display:flex;flex-direction:column;gap:6px}
+.ex .btn{font-weight:500}
+
+/* ---------- modal & toast ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(59,43,54,.30);backdrop-filter:blur(3px);display:flex;align-items:flex-start;justify-content:center;padding:5vh 16px;overflow:auto;z-index:50;animation:fade .15s ease}
+.modal{background:var(--surface);border-radius:22px;box-shadow:0 24px 70px rgba(59,43,54,.28);width:100%;max-width:560px;padding:30px;position:relative;animation:pop .18s ease}
+.modal.wide{max-width:840px}
+.modal.img{max-width:min(1100px,94vw);padding:12px}
+.modal.img img{width:100%;border-radius:14px;display:block}
+.modal .close{position:absolute;top:14px;inset-inline-end:14px;width:36px;height:36px;border-radius:50%;border:0;background:var(--bg-2);cursor:pointer;font-size:20px;line-height:1;color:var(--ink-2);z-index:2}
+.modal .close:hover{background:var(--rose-s)}
+.mh{font-family:var(--serif);font-weight:500;font-size:26px;margin:0 0 18px;color:var(--plum)}
+@keyframes fade{from{opacity:0}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}}
+#toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,20px);background:var(--plum);color:#fff;padding:11px 22px;border-radius:18px;box-shadow:0 10px 30px rgba(59,43,54,.3);opacity:0;pointer-events:none;transition:.25s;z-index:80;font-weight:500;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- AI & app bits ---------- */
+.nav .lbl-s{display:none}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+.spin{width:15px;height:15px;border-radius:50%;border:2px solid currentColor;border-inline-end-color:transparent;display:inline-block;animation:spin .7s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-note{background:linear-gradient(135deg,#FBF1EE,#F3ECF6);border-color:#EBDCE3;color:var(--ink-2)}
+.gaps{margin-top:8px;font-size:13.5px;color:#7E6235;background:var(--gold-s);border-radius:10px;padding:6px 11px}
+.res.out{opacity:.72}
+.sug{border:1px dashed #D9B9B5;background:transparent;color:var(--rose-d);border-radius:999px;padding:2px 11px;font-size:13px;cursor:pointer;margin-inline-start:6px}
+.sug:hover{background:var(--rose-s)}
+
+/* ---------- responsive ---------- */
+@media (max-width:1080px){
+  .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .intake,.g2{grid-template-columns:minmax(0,1fr)}
+  .main{padding:28px 26px 60px}
+}
+@media (max-width:760px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .main{min-width:0}
+  .tag{white-space:normal}
+  .side{min-width:0;position:sticky;top:0;height:auto;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;z-index:30;border-inline-end:0;border-bottom:1px solid var(--line)}
+  .brand{padding:0}.brand h1{font-size:24px}.brand p{display:none}.brand svg{width:30px;height:30px}
+  .nav{position:fixed;bottom:0;left:0;right:0;z-index:40;display:flex;justify-content:space-around;gap:2px;background:rgba(255,252,251,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+  .nav a{flex:1;min-width:0;flex-direction:column;gap:2px;margin:0;padding:6px 2px;font-size:11.5px;border-radius:12px;text-align:center}
+  .nav a:hover{background:transparent}
+  .nav a.on{background:var(--rose-s);box-shadow:none;color:var(--plum)}
+  .nav .i{width:21px;height:21px}
+  .nav .lbl{display:none}.nav .lbl-s{display:block}
+  .nav .badge{display:none}
+  .side-foot{display:none}
+  .main{padding:18px 16px calc(96px + env(safe-area-inset-bottom))}
+  #toast{bottom:calc(86px + env(safe-area-inset-bottom))}
+  .f,.tp-in{font-size:16px}
+  .modal-bg{padding:calc(10px + env(safe-area-inset-top)) 8px calc(10px + env(safe-area-inset-bottom))}
+  .ph h2{font-size:28px}
+  .card{padding:18px}
+  .res{grid-template-columns:auto minmax(0,1fr)}
+  .res .acts{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
+  .modal{padding:22px 18px}
+  .phead{flex-direction:column;align-items:flex-start;gap:10px}
+  .pgrid{grid-template-columns:minmax(0,1fr)}
+  .filters .search{min-width:0;flex-basis:100%}
+  .seg{max-width:100%}
+}
+/* side gutters that also clear a phone's side system bar */
+:root{--gut:46px}
+@media (max-width:1080px){:root{--gut:26px}}
+@media (max-width:760px){
+  :root{--gut:16px}
+  .nav{padding-left:max(6px,env(safe-area-inset-left,0px));padding-right:max(6px,env(safe-area-inset-right,0px))}
+  .side{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+}
+.main{padding-left:max(var(--gut),env(safe-area-inset-left,0px));padding-right:max(var(--gut),env(safe-area-inset-right,0px))}
+.welcome{margin-bottom:18px;background:linear-gradient(135deg,#FFFBFA,#F8F1F6)}
+</style>
+</head>
+<body>
+<script>document.documentElement.setAttribute('dir','rtl');document.documentElement.setAttribute('lang','he');</script>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <svg viewBox="0 0 44 44" width="42" height="42" aria-hidden="true"><circle cx="17" cy="22" r="11.5" fill="none" stroke="#C98E95" stroke-width="2"/><circle cx="27" cy="22" r="11.5" fill="none" stroke="#C2A574" stroke-width="2"/><circle cx="22" cy="22" r="2.4" fill="#5E3B54"/></svg>
+      <div><h1>מעגל</h1><p>ניהול קשרי מנטורינג</p></div>
+    </div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot"><b>✿ המעגל שלך</b><span id="savestate">טוען…</span></div>
+  </aside>
+  <main class="main" id="main"></main>
+</div>
+<div id="modal-root"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* ================= helpers ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const pad = n => String(n).padStart(2, '0');
+const isoDate = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const todayISO = () => isoDate(new Date());
+const daysAgo = n => { const d = new Date(); d.setDate(d.getDate() - n); return isoDate(d); };
+const parseISO = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const dayDiff = iso => Math.round((parseISO(todayISO()) - parseISO(iso)) / 864e5); // >0 = in the past
+const byName = (a, b) => a.name.localeCompare(b.name, 'he');
+const reEsc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+function fmtDate(iso) { return iso ? parseISO(iso).toLocaleDateString('he-IL', {day:'numeric', month:'long', year:'numeric'}) : ''; }
+function relDate(iso) {
+  if (!iso) return '';
+  const d = dayDiff(iso);
+  if (d === 0) return 'היום';
+  if (d === 1) return 'אתמול';
+  if (d === 2) return 'שלשום';
+  if (d === -1) return 'מחר';
+  if (d === -2) return 'בעוד יומיים';
+  if (d < 0) return -d < 14 ? `בעוד ${-d} ימים` : `בעוד ${Math.round(-d / 7)} שבועות`;
+  if (d < 7) return `לפני ${d} ימים`;
+  if (d < 30) { const w = Math.round(d / 7); return w === 1 ? 'לפני שבוע' : w === 2 ? 'לפני שבועיים' : `לפני ${w} שבועות`; }
+  if (d < 365) { const m = Math.round(d / 30); return m === 1 ? 'לפני חודש' : m === 2 ? 'לפני חודשיים' : `לפני ${m} חודשים`; }
+  return 'לפני יותר משנה';
+}
+function toast(msg, ms = 3000) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), ms); }
+function busy(btn, label) {
+  if (!btn) return () => {};
+  const html = btn.innerHTML; btn.disabled = true; btn.innerHTML = `<span class="spin"></span> ${label}`;
+  return () => { if (btn.isConnected) { btn.disabled = false; btn.innerHTML = html; } };
+}
+
+const ICON = {
+  home: '<svg class="i" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  users: '<svg class="i" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.8"/><path d="M16 14.6c2.7-.3 4.8 1.4 5.5 4.4"/></svg>',
+  inbox: '<svg class="i" viewBox="0 0 24 24"><path d="M12 3v11m0 0-4-4m4 4 4-4"/><path d="M3 14v4a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/></svg>',
+  spark: '<svg class="i" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg>',
+  tag: '<svg class="i" viewBox="0 0 24 24"><path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="8" cy="8" r="1.6"/></svg>',
+  gear: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>',
+  plus: '<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  cal: '<svg class="i" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>',
+  upload: '<svg class="i" viewBox="0 0 24 24"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>',
+  trash: '<svg class="i" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>',
+  phone: '<svg class="i" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
+  mail: '<svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/></svg>',
+  link: '<svg class="i" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+  check: '<svg class="i" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  edit: '<svg class="i" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>',
+  download: '<svg class="i" viewBox="0 0 24 24"><path d="M12 4v12m0 0-4.5-4.5M12 16l4.5-4.5"/><path d="M4 18v1a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-1"/></svg>',
+};
+
+/* ================= tag library ================= */
+const CATS = [
+  {id:'role',     name:'תפקיד ומקצוע',      color:'rose',  w:3},
+  {id:'region',   name:'איזור ואופן עבודה',  color:'sage',  w:2},
+  {id:'industry', name:'רקע תעשייתי',        color:'gold',  w:2},
+  {id:'systems',  name:'מערכות ותוכנות',     color:'lav',   w:1.5},
+  {id:'skills',   name:'כישורים מקצועיים',   color:'sky',   w:1.2},
+  {id:'stage',    name:'שלב בקריירה',        color:'peach', w:1},
+  {id:'status',   name:'זמינות וסטטוס',      color:'mint',  w:1},
+  {id:'other',    name:'אחר',               color:'stone', w:1},
+];
+const catOf = id => CATS.find(c => c.id === id) || CATS[CATS.length - 1];
+
+// [category, label, keywords used for automatic detection]
+const DEF_TAGS = [
+  ['role','מנהל/ת חשבונות',['מנהלת חשבונות','מנהל חשבונות','מנהלות חשבונות','הנהלת חשבונות','מנה"ח','bookkeeper','bookkeeping']],
+  ['role','מנהל/ת חשבונות סוג 1',['סוג 1','סוג א']],
+  ['role','מנהל/ת חשבונות סוג 2',['סוג 2','סוג ב']],
+  ['role','מנהל/ת חשבונות סוג 3',['סוג 3','סוג ג']],
+  ['role','חשב/ת שכר',['חשב שכר','חשבת שכר','חשבות שכר','מחלקת שכר','payroll']],
+  ['role','רו"ח',['רו"ח','רואה חשבון','רואת חשבון','רואי חשבון','cpa']],
+  ['role','כלכלן/ית',['כלכלן','כלכלנית','כלכלנים','economist']],
+  ['role','חשב/ת',['re:(?:^|[^\\u0590-\\u05FF])[והבלמשכ]?חשב(?:ת)?(?!\\s*שכר)(?=$|[^\\u0590-\\u05FF])']],
+  ['role','קונטרולר/ית',['קונטרולר','קונטרולרית','controller']],
+  ['role','סמנכ"ל/ית כספים',['סמנכ"ל כספים','סמנכ"לית כספים','סמנכל כספים','מנהל כספים','מנהלת כספים','cfo','vp finance']],
+  ['role','אנליסט/ית פיננסי/ת',['אנליסט','אנליסטית','analyst','fp&a']],
+  ['role','מבקר/ת פנים',['מבקר פנים','מבקרת פנים','ביקורת פנים','internal audit']],
+  ['role','יועץ/ת מס',['יועץ מס','יועצת מס','ייעוץ מס']],
+  ['role','גזבר/ית',['גזבר','גזברית','treasury','treasurer']],
+
+  ['region','איזור צפון',['צפון','חיפה','קריות','קריית ביאליק','קריית מוצקין','נהריה','עכו','כרמיאל','עפולה','טבריה','נצרת','יקנעם','צפת','גליל','קריית שמונה']],
+  ['region','איזור מרכז',['מרכז','גוש דן','תל אביב','תל-אביב','ת"א','רמת גן','פתח תקווה','פתח תקוה','פ"ת','חולון','בת ים','ראשון לציון','ראשל"צ','רחובות','גבעתיים','בני ברק','ראש העין','לוד','רמלה','מודיעין','קריית אונו','אור יהודה','נס ציונה','יהוד']],
+  ['region','איזור השרון',['השרון','נתניה','כפר סבא','רעננה','הוד השרון','הרצליה','רמת השרון','כפר יונה']],
+  ['region','איזור ירושלים',['ירושלים','בית שמש','מבשרת','מעלה אדומים']],
+  ['region','איזור דרום',['דרום','באר שבע','אשדוד','אשקלון','אילת','קריית גת','דימונה','נתיבות','שדרות','אופקים','ים המלח']],
+  ['region','עבודה מרחוק',['מרחוק','מהבית','remote']],
+  ['region','היברידי',['היברידי','היברידית','hybrid']],
+
+  ['industry','רקע פארמה',['פארמה','pharma','תרופות','ביומד','מכשור רפואי','biotech','ביוטק']],
+  ['industry','רקע הייטק',['הייטק','היי-טק','היי טק','hi-tech','high-tech','tech','סייבר','תוכנה','saas','פינטק','fintech']],
+  ['industry','רקע נדל"ן',['נדל"ן','נדלן','בנייה','קבלנות','real estate']],
+  ['industry','רקע מלונאות',['מלונאות','מלון','מלונות','hotel','hospitality','תיירות']],
+  ['industry','רקע קמעונאות',['קמעונאות','retail','רשת חנויות','סופרמרקט','אופנה']],
+  ['industry','רקע תעשייה וייצור',['תעשייה','תעשיה','ייצור','מפעל','manufacturing']],
+  ['industry','רקע בנקאות וביטוח',['בנק','בנקאות','ביטוח','חברת ביטוח','בית השקעות','banking','insurance']],
+  ['industry','רקע ציבורי וממשלתי',['ממשלתי','ממשלה','מגזר ציבורי','רשות מקומית','עירייה','עיריית']],
+  ['industry','רקע עמותות',['עמותה','עמותות','מלכ"ר','ngo']],
+  ['industry','רקע משרד רו"ח',['משרד רו"ח','משרד רואי חשבון','big4','big 4','kpmg','deloitte','pwc','bdo']],
+  ['industry','רקע סטארט-אפ',['סטארט-אפ','סטארטאפ','סטארט אפ','startup','start-up']],
+  ['industry','רקע לוגיסטיקה',['לוגיסטיקה','שילוח','logistics']],
+  ['industry','רקע מזון',['מזון','food','foodtech']],
+
+  ['systems','SAP',['sap']],
+  ['systems','Priority',['priority','פריוריטי','פריורטי']],
+  ['systems','חשבשבת',['חשבשבת','hashavshevet']],
+  ['systems','Excel מתקדם',['excel','אקסל','פיבוט','pivot','vlookup','xlookup']],
+  ['systems','Power BI',['power bi','powerbi']],
+  ['systems','חילן',['חילן','hilan']],
+  ['systems','מיכפל',['מיכפל','michpal']],
+  ['systems','Oracle',['oracle','אורקל']],
+  ['systems','NetSuite',['netsuite','נטסוויט']],
+  ['systems','Monday',['monday.com','מאנדיי','מנדיי']],
+  ['systems','SQL',['sql']],
+
+  ['skills','דוחות כספיים',['דוחות כספיים','דו"חות כספיים','דוח כספי','financial statements','מאזנים']],
+  ['skills','סגירות חודשיות ורבעוניות',['סגירות','סגירה חודשית','סגירת חודש','סגירת החודש','סגירות חודשיות','סגירות רבעוניות','month end','month-end','closing']],
+  ['skills','התאמות בנקים',['התאמות בנקים','התאמת בנק','התאמות בנק','התאמות','reconciliation','reconciliations']],
+  ['skills','תקציב ובקרה',['תקציב','תקציבים','בקרה תקציבית','budget','budgeting']],
+  ['skills','IFRS',['ifrs']],
+  ['skills','US GAAP',['gaap','us gaap']],
+  ['skills','SOX',['sox']],
+  ['skills','דיני עבודה',['דיני עבודה','חוקי עבודה','זכויות עובדים','labor law']],
+  ['skills','מיסוי',['מיסוי','מס הכנסה','מסים','דוחות שנתיים','tax']],
+  ['skills','מע"מ ודיווחים',['מע"מ','מעמ','דיווח מע"מ','vat']],
+  ['skills','ניתוח נתונים',['ניתוח נתונים','דאטה','data','analytics','דשבורד','דשבורדים']],
+  ['skills','מודלים פיננסיים',['מודל פיננסי','מודלים פיננסיים','תחזית','תחזיות','forecast','modeling','מודלים']],
+  ['skills','ניהול צוות',['ניהול צוות','ניהלה צוות','ניהל צוות','מנהלת צוות','מנהל צוות','ניהול עובדים','מובילה צוות','מוביל צוות','team lead']],
+  ['skills','ניהול תזרים',['תזרים','תזרים מזומנים','cash flow','cashflow']],
+  ['skills','גבייה',['גבייה','גביה','collections']],
+  ['skills','הנהלת חשבונות ספקים',['ספקים','accounts payable']],
+  ['skills','תמחיר ועלויות',['תמחיר','עלויות','מלאי','costing','cost accounting']],
+  ['skills','אוטומציות',['אוטומציה','אוטומציות','automation','rpa','zapier','מאקרו','macro']],
+  ['skills','AI',['ai','בינה מלאכותית','chatgpt','claude','gpt','copilot','קופיילוט']],
+  ['skills','אנגלית ברמה גבוהה',['אנגלית','english']],
+  ['skills','עבודה מול רשויות',['רשויות','ביטוח לאומי','רשות המסים']],
+  ['skills','יכולות הדרכה',['הדרכה','הדרכות','מדריכה','להדריך','training']],
+
+  ['stage','סטודנט/ית',['סטודנט','סטודנטית','סטודנטים','student']],
+  ['stage','בוגר/ת טרי/ה',['בוגר','בוגרת','בוגרי','סיימה את הלימודים','סיים את הלימודים','סיימה תואר','graduate']],
+  ['stage',"ג'וניור",["ג'וניור",'גוניור','junior','ללא ניסיון','משרה ראשונה']],
+  ['stage','מנוסה',['מנוסה','שנות ניסיון','senior','סניור']],
+  ['stage','בכיר/ה',['בכיר','בכירה','בכירים','executive']],
+  ['stage','הסבה מקצועית',['הסבה','הסבה מקצועית','career change']],
+  ['stage','חזרה לשוק העבודה',['חזרה לשוק','חוזרת לשוק','חוזר לשוק','חזרה לעבודה','אחרי הפסקה','חופשת לידה']],
+
+  ['status','מחפש/ת עבודה באופן פעיל',['מחפשת עבודה','מחפש עבודה','בחיפוש עבודה','open to work']],
+  ['status','פתוח/ה להצעות',['פתוחה להצעות','פתוח להצעות','פתוחה לשינוי','פתוח לשינוי']],
+  ['status','משרה מלאה',['משרה מלאה','full time','full-time']],
+  ['status','משרה חלקית',['משרה חלקית','חצי משרה','part time','part-time']],
+  ['status','פרילנס',['פרילנס','פרילנסרית','freelance','עצמאית','עצמאי']],
+  ['status','זמין/ה מיידית',['מיידי','מיידית','מידית','immediate']],
+  ['status','מוכן/ה לחנוך',['לחנוך','לחניכה','ללוות','מנטורית','מנטור','מנטורינג']],
+];
+
+/* ================= storage (IndexedDB, local only) ================= */
+const DB = {
+  db: null,
+  open() { return new Promise(res => { try { const r = indexedDB.open('maagal-mentoring', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => { this.db = r.result; res(true); }; r.onerror = () => res(false); r.onblocked = () => res(false); } catch (e) { res(false); } }); },
+  get(k) { return new Promise(res => { try { const q = this.db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(null); } catch (e) { res(null); } }); },
+  set(k, v) { return new Promise(res => { try { const tx = this.db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete = () => res(true); tx.onerror = () => res(false); } catch (e) { res(false); } }); },
+};
+let S = null, DIRTY = false, saveT = null;
+/* When the page runs as a Claude artifact, the data lives in the artifact's store, in the signed-in
+   person's own private subtree (data/users/<id>/crm/...), so it follows her to every device.
+   Everywhere else (a file on disk, the installable web app) it lives in this browser's IndexedDB. */
+const HOSTED = typeof window.claude?.use === 'function';
+let CLOUD = null, SAVED = { people: new Map(), meetings: new Map(), tags: '' };
+let SAVING = false, SAVE_AGAIN = false, PENDING_SAVE = false, LAST_LOAD = 0;
+function save() {
+  DIRTY = true; PENDING_SAVE = true; clearTimeout(saveT);
+  $('#savestate').textContent = 'שומר…';
+  saveT = setTimeout(flushSave, CLOUD ? 500 : 300);
+}
+async function flushSave() {
+  updateNavBadges();
+  if (!CLOUD) {
+    const ok = DB.db ? await DB.set('state', S) : false;
+    PENDING_SAVE = false;
+    $('#savestate').textContent = ok ? 'כל השינויים נשמרו במכשיר' : 'השמירה נכשלה – כדאי לייצא גיבוי';
+    return;
+  }
+  if (SAVING) { SAVE_AGAIN = true; return; }
+  SAVING = true;
+  try {
+    do { SAVE_AGAIN = false; await cloudSync(); } while (SAVE_AGAIN);
+    $('#savestate').textContent = 'נשמר ומסונכרן בחשבון שלך';
+  } catch (e) {
+    console.error(e);
+    const full = e?.code === 'quota_exceeded';
+    $('#savestate').textContent = full ? 'נגמר מקום האחסון' : 'השמירה נכשלה';
+    toast(full ? 'נגמר מקום האחסון. כדאי למחוק פגישות ישנות או לייצא גיבוי.' : 'השמירה לחשבון נכשלה. בדקי את החיבור, וייצאי גיבוי ליתר ביטחון.', 6000);
+  }
+  SAVING = false; PENDING_SAVE = SAVE_AGAIN;
+}
+// One document per person and per meeting; only what changed is written.
+const cloudBody = o => { const c = JSON.parse(JSON.stringify(o)); delete c.attachments; return c; };
+async function cloudSync() {
+  for (const kind of ['people', 'meetings']) {
+    const col = CLOUD[kind], saved = SAVED[kind], seen = new Set();
+    for (const item of [...S[kind]]) {
+      seen.add(item.id);
+      const body = cloudBody(item), js = JSON.stringify(body);
+      if (saved.get(item.id) !== js) { await col.doc(item.id).set(body); saved.set(item.id, js); }
+    }
+    for (const id of [...saved.keys()]) if (!seen.has(id)) { await col.doc(id).delete(); saved.delete(id); }
+  }
+  const tj = JSON.stringify(S.tags);
+  if (tj !== SAVED.tags) { await CLOUD.tags.set({ list: JSON.parse(tj) }); SAVED.tags = tj; }
+}
+async function cloudLoad() {
+  const [ps, ms, tg] = await Promise.all([CLOUD.people.get(), CLOUD.meetings.get(), CLOUD.tags.get()]);
+  const clone = d => JSON.parse(JSON.stringify(d.data() || {}));
+  const people = ps.docs.map(clone).filter(p => p.id), meetings = ms.docs.map(clone).filter(m => m.id && m.personId);
+  people.forEach(p => { if (!Array.isArray(p.tags)) p.tags = []; if (typeof p.name !== 'string') p.name = ''; });
+  meetings.forEach(m => { if (!Array.isArray(m.tags)) m.tags = []; m.attachments = []; if (typeof m.text !== 'string') m.text = ''; if (typeof m.date !== 'string') m.date = todayISO(); });
+  const stored = tg.exists && Array.isArray(tg.data().list) ? JSON.parse(JSON.stringify(tg.data().list)).filter(t => t && t.id && typeof t.label === 'string') : null;
+  S = { v: 1, tags: stored || freshState(false).tags, people, meetings };
+  S.tags.forEach(t => { if (!Array.isArray(t.kw)) t.kw = []; });
+  SAVED = { people: new Map(people.map(p => [p.id, JSON.stringify(cloudBody(p))])), meetings: new Map(meetings.map(m => [m.id, JSON.stringify(cloudBody(m))])), tags: stored ? JSON.stringify(S.tags) : '' };
+  reindexTags(); LAST_LOAD = Date.now();
+  return !stored;   // true on a first visit: the tag library still has to be written
+}
+async function cloudOpen(db, user) {
+  const uid = await user.id(); if (!uid) return false;
+  const within = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))]);
+  const root = db.doc('data/users/' + uid + '/crm');
+  const meta = await within(root.get(), 12000);
+  if (!meta.exists) await within(root.set({ v: 1, created: todayISO() }), 12000);   // also proves this person may save here
+  CLOUD = { people: root.collection('people'), meetings: root.collection('meetings'), tags: root.collection('lib').doc('tags') };
+  if (await within(cloudLoad(), 20000)) save();
+  return true;
+}
+document.addEventListener('visibilitychange', async () => {
+  // coming back to the app on this device: pick up what was saved from another device
+  if (document.visibilityState !== 'visible' || !CLOUD || SAVING || PENDING_SAVE || $('#modal-root').children.length || Date.now() - LAST_LOAD < 30000) return;
+  try { await cloudLoad(); updateNavBadges(); render(); } catch (e) { console.error(e); }
+});
+
+/* ================= tags: index + detection ================= */
+let TAGMAP = new Map(), TAG_RX = [];
+const NB = '[^\\u0590-\\u05FFa-z0-9]';
+function normText(s) { return String(s || '').toLowerCase().replace(/[״“”„]/g, '"').replace(/[׳‘’`]/g, "'").replace(/[֑-ׇ]/g, ''); }
+function kwRegex(kw) {
+  if (kw.startsWith('re:')) return new RegExp(kw.slice(3), 'i');
+  const k = reEsc(normText(kw));
+  const heb = /^[א-ת]/.test(k);
+  return new RegExp(`(?:^|${NB})${heb ? '(?:[והבלמשכ]{0,2})' : ''}${k}(?=$|${NB})`);
+}
+function reindexTags() {
+  TAGMAP = new Map(S.tags.map(t => [t.id, t]));
+  TAG_RX = S.tags.map(t => ({ id: t.id, rx: [...(t.kw || []), t.label].map(k => { try { return kwRegex(k); } catch (e) { return null; } }).filter(Boolean) }));
+}
+function sortTags(ids) {
+  const order = Object.fromEntries(CATS.map((c, i) => [c.id, i]));
+  return [...new Set(ids)].filter(id => TAGMAP.has(id)).sort((a, b) => {
+    const A = TAGMAP.get(a), B = TAGMAP.get(b);
+    return (order[A.cat] ?? 99) - (order[B.cat] ?? 99) || A.label.localeCompare(B.label, 'he');
+  });
+}
+function detectTags(text) { const n = normText(text); return sortTags(TAG_RX.filter(({ rx }) => rx.some(r => r.test(n))).map(x => x.id)); }
+const catW = id => catOf(TAGMAP.get(id)?.cat).w;
+function chip(id, { rm = false, count = null, act = '', cls = '' } = {}) {
+  const t = TAGMAP.get(id); if (!t) return '';
+  return `<span class="tag c-${catOf(t.cat).color} ${cls}" data-tag="${t.id}"${act ? ` data-act="${act}"` : ''}>#${esc(t.label)}${count != null ? `<i class="cnt">${count}</i>` : ''}${rm ? `<button class="x" data-rm="${t.id}" aria-label="הסרה">×</button>` : ''}</span>`;
+}
+function tagCounts() { const m = new Map(); for (const p of S.people) for (const id of p.tags) m.set(id, (m.get(id) || 0) + 1); return m; }
+
+/* tag picker (autocomplete) */
+function mountTagPicker(host, { get, set, placeholder = 'הוסיפי תגית…', allowCreate = true, showChips = true }) {
+  function draw(focus) {
+    host.innerHTML = `<div class="tp">${showChips ? sortTags(get()).map(id => chip(id, { rm: true })).join('') : ''}<div class="tp-wrap"><input class="tp-in" placeholder="${esc(placeholder)}" autocomplete="off"><div class="tp-dd" hidden></div></div></div>`;
+    const inp = $('.tp-in', host), dd = $('.tp-dd', host);
+    $$('[data-rm]', host).forEach(b => b.onclick = e => { e.stopPropagation(); set(get().filter(x => x !== b.dataset.rm)); draw(true); });
+    let items = [], hi = 0;
+    const paint = () => {
+      if (!items.length) { dd.hidden = true; return; }
+      dd.innerHTML = items.map((it, i) => it.t
+        ? `<div class="tp-opt${i === hi ? ' hi' : ''}" data-i="${i}"><span class="dot c-${catOf(it.t.cat).color}"></span>#${esc(it.t.label)}<small>${esc(catOf(it.t.cat).name)}</small></div>`
+        : `<div class="tp-opt create${i === hi ? ' hi' : ''}" data-i="${i}">+ יצירת תגית חדשה: <b>#${esc(it.create)}</b></div>`).join('');
+      dd.hidden = false;
+      $$('.tp-opt', dd).forEach(o => o.onmousedown = e => { e.preventDefault(); pick(+o.dataset.i); });
+    };
+    const show = () => {
+      const raw = inp.value.trim().replace(/^#/, ''), q = normText(raw), sel = new Set(get());
+      items = S.tags.filter(t => !sel.has(t.id) && (!q || normText(t.label).includes(q) || (t.kw || []).some(k => !k.startsWith('re:') && normText(k).includes(q))))
+        .sort((a, b) => (normText(a.label).startsWith(q) ? 0 : 1) - (normText(b.label).startsWith(q) ? 0 : 1))
+        .slice(0, 9).map(t => ({ t }));
+      if (allowCreate && q && !S.tags.some(t => normText(t.label) === q)) items.push({ create: raw });
+      hi = 0; paint();
+    };
+    const pick = i => {
+      const it = items[i]; if (!it) return;
+      let id;
+      if (it.t) id = it.t.id;
+      else { const t = { id: uid(), cat: 'other', label: it.create, kw: [] }; S.tags.push(t); reindexTags(); save(); id = t.id; toast(`נוצרה תגית חדשה #${t.label} (אפשר לשייך לקטגוריה במסך התגיות)`); }
+      set([...get(), id]); draw(true);
+    };
+    inp.oninput = show; inp.onfocus = show;
+    inp.onblur = () => setTimeout(() => { dd.hidden = true; }, 120);
+    inp.onkeydown = e => {
+      if (e.key === 'ArrowDown') { e.preventDefault(); hi = Math.min(hi + 1, items.length - 1); paint(); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); hi = Math.max(hi - 1, 0); paint(); }
+      else if (e.key === 'Enter') { e.preventDefault(); if (!dd.hidden) pick(hi); }
+      else if (e.key === 'Escape') { dd.hidden = true; e.stopPropagation(); }
+      else if (e.key === 'Backspace' && !inp.value && showChips) { const s = get(); if (s.length) { set(s.slice(0, -1)); draw(true); } }
+    };
+    if (focus) inp.focus();
+  }
+  draw(false);
+}
+
+/* ================= text search (TF-IDF style) ================= */
+const STOP = new Set('של את על עם זה זו זאת היא הוא אני אתה יש אין לא כן גם או כי אם מה כל אבל רק עוד היה היתה הייתה להיות לה לו אצל אשר שלה שלו שלי אנחנו הם הן בין כמו אחרי לפני מאוד יותר פחות דרוש דרושה דרושים דרושות משרה משרת לתפקיד תפקיד ניסיון יתרון חובה עבודה חברה חברת לחברת בחברת כולל וכן אנו מחפשים מחפשת מחפש תחום בתחום שנים שנות לפחות עם ידע היכרות רצון יכולת מישהי מישהו שלנו אותה אותו לנו לי the and of to a in for with on is are be as at by or an'.split(' '));
+const PFX = 'והבלמשכ';
+function words(text) {
+  return normText(text).split(/[^א-תa-z0-9"'+#&]+/).map(w => w.replace(/^["'#]+|["']+$/g, ''))
+    .filter(w => w.length >= 2 && !STOP.has(w) && !/^\d+$/.test(w));
+}
+function terms(w) {
+  const out = [w];
+  if (/^[א-ת]/.test(w) && w.length >= 4 && PFX.includes(w[0])) {
+    out.push(w.slice(1));
+    if (w.length >= 5 && PFX.includes(w[1])) out.push(w.slice(2));
+  }
+  return out;
+}
+const meetingsOf = pid => S.meetings.filter(m => m.personId === pid).sort((a, b) => b.date.localeCompare(a.date) || (b.created || 0) - (a.created || 0));
+const lastMeeting = pid => { let d = ''; for (const m of S.meetings) if (m.personId === pid && m.date > d) d = m.date; return d; };
+const personName = id => S.people.find(p => p.id === id)?.name || '';
+function personDoc(p) { return [p.role, p.company, p.notes, ...meetingsOf(p.id).map(m => m.title + '. ' + m.text)].join('\n'); }
+
+function runMatch(q, sel, kind) {
+  const docs = S.people.map(p => { const tf = new Map(); for (const w of words(personDoc(p))) for (const t of terms(w)) tf.set(t, (tf.get(t) || 0) + 1); return { p, tf }; });
+  const N = docs.length || 1, df = new Map();
+  for (const d of docs) for (const t of d.tf.keys()) df.set(t, (df.get(t) || 0) + 1);
+  const idf = t => Math.log(1 + (N + 1) / ((df.get(t) || 0) + 0.5));
+  const qWords = [...new Set(words(q))].filter(w => terms(w).some(t => df.has(t)));
+  const totW = sel.reduce((s, x) => s + catW(x.id), 0);
+  const out = [];
+  for (const { p, tf } of docs) {
+    if (kind !== 'all' && p.kind !== kind) continue;
+    const pt = new Set(p.tags);
+    if (sel.some(x => x.must && !pt.has(x.id))) continue;
+    const hit = sel.filter(x => pt.has(x.id)), miss = sel.filter(x => !pt.has(x.id));
+    const tagScore = totW ? hit.reduce((s, x) => s + catW(x.id), 0) / totW : 0;
+    let num = 0, den = 0; const mw = [];
+    for (const w of qWords) {
+      const ts = terms(w); const wi = Math.max(...ts.map(t => df.has(t) ? idf(t) : 0)); den += wi;
+      let best = 0, bt = '';
+      for (const t of ts) { const f = tf.get(t) || 0; if (f) { const v = idf(t) * Math.min(1, 0.6 + 0.25 * Math.log(1 + f)); if (v > best) { best = v; bt = t; } } }
+      if (best) { num += best; mw.push({ w, t: bt, s: best }); }
+    }
+    const textScore = den ? num / den : 0;
+    const last = lastMeeting(p.id), age = last ? dayDiff(last) : 9999;
+    const rec = !last ? 0 : age <= 30 ? 1 : age <= 90 ? 0.7 : age <= 180 ? 0.4 : 0.15;
+    const score = sel.length ? 0.62 * tagScore + 0.30 * textScore + 0.08 * rec : (qWords.length ? 0.88 * textScore + 0.12 * rec : rec);
+    if (score < 0.08 && !hit.length) continue;
+    mw.sort((a, b) => b.s - a.s);
+    out.push({ p, score, hit, miss, mw: mw.slice(0, 8), last });
+  }
+  return out.sort((a, b) => b.score - a.score).slice(0, 25);
+}
+function highlight(text, ws) {
+  if (!ws.length) return esc(text);
+  const rx = new RegExp('(' + ws.map(reEsc).sort((a, b) => b.length - a.length).join('|') + ')', 'gi');
+  let out = '', last = 0;
+  text.replace(rx, (m, _g, off) => { out += esc(text.slice(last, off)) + '<mark>' + esc(m) + '</mark>'; last = off + m.length; return m; });
+  return out + esc(text.slice(last));
+}
+function bestSnippet(p, mw) {
+  if (!mw.length) return '';
+  const ts = mw.map(x => x.t);
+  const sents = personDoc(p).split(/(?<=[.!?\n])\s+/).map(s => s.trim()).filter(s => s.length > 8);
+  let best = '', bs = 0;
+  for (const s of sents) { const n = normText(s); const sc = ts.filter(t => n.includes(t)).length; if (sc > bs) { bs = sc; best = s; } }
+  if (!best) return '';
+  if (best.length > 230) best = best.slice(0, 227) + '…';
+  return highlight(best, ts);
+}
+
+/* ================= AI layer (optional: Claude API with the user's own key) =================
+   The key is stored only on this device (separately from the data, so it is never part of a backup).
+   Requests go straight from the browser to api.anthropic.com. */
+let AI = { key: '', model: 'claude-opus-5-5' };
+const AI_MODELS = [['claude-opus-5-5', 'Claude Opus 5.5 · מומלץ'], ['claude-sonnet-5-5', 'Claude Sonnet 5.5 · מהיר וזול יותר'], ['claude-haiku-5-5', 'Claude Haiku 5.5 · הכי מהיר וזול']];
+/* As a Claude artifact the page asks Claude directly, on the viewer's own account (SAMPLE); no key needed. */
+let SAMPLE = null, SAMPLE_LIM = null, DOWNLOADS = null;
+const aiOn = () => !!SAMPLE || (!HOSTED && !!AI.key);
+const SAMPLE_MSG = {
+  not_granted: 'ה-AI לא אושר לשימוש בעמוד הזה. אפשר להמשיך עם הניתוח הרגיל.',
+  sampling_disabled: 'ה-AI לא זמין בחשבון הזה.',
+  rate_limited: 'יותר מדי בקשות, או שהגעת למגבלת השימוש בחשבון. נסי שוב מאוחר יותר.',
+  session_expired: 'צריך להתחבר מחדש ל-Claude ואז לנסות שוב.',
+  image_rejected: 'אחת התמונות לא התקבלה (סוג או גודל). נסי תמונה אחרת.',
+  images_unavailable: 'קריאת תמונות לא זמינה בתצוגה הזו. אפשר להדביק את הטקסט במקום.',
+  refused: 'ה-AI לא עיבד את התוכן הזה. אפשר להשתמש בניתוח הרגיל.',
+  prompt_too_large: 'התוכן ארוך מדי לניתוח בבת אחת. נסי לפצל אותו.',
+  invalid_json: 'התקבלה תשובה לא צפויה מה-AI. נסי שוב.',
+  empty_completion: 'ה-AI לא החזיר תשובה. נסי שוב עם פחות תוכן.',
+};
+async function aiJSON({ system, text, files = [], dataUrls = [], schema, format, effort = 'low' }) {
+  let out;
+  if (SAMPLE) {
+    const opts = {}; if (files.length) opts.images = files;
+    try { out = await SAMPLE.json(`${system}\n\n${format}\n\n${text}`, opts); }
+    catch (e) {
+      if (['not_granted', 'sampling_disabled', 'not_declared', 'capability_disabled', 'capability_removed'].includes(e?.code)) SAMPLE = null;
+      throw new Error(SAMPLE_MSG[e?.code] || 'שירות ה-AI לא זמין כרגע. נסי שוב בעוד רגע.');
+    }
+  } else {
+    out = await claudeApi({ system, schema, effort, content: [
+      ...dataUrls.map(u => ({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: u.split(',')[1] } })),
+      { type: 'text', text }] });
+  }
+  if (!out || typeof out !== 'object' || Array.isArray(out)) throw new Error('התקבלה תשובה לא צפויה מה-AI. נסי שוב.');
+  return out;
+}
+const INTAKE_FORMAT = 'Reply with only one JSON object and no other text, with exactly these keys: "person_name", "kind" (one of "mentee", "mentor", "contact"), "role", "company", "phone", "email", "meeting_date", "follow_up_date", "title", "summary", "image_text" (all strings), "tag_ids" (array of strings) and "new_tags" (array of strings). Example of the shape: {"person_name":"","kind":"mentee","role":"","company":"","phone":"","email":"","meeting_date":"","follow_up_date":"","title":"","summary":"","image_text":"","tag_ids":[],"new_tags":[]}';
+const MATCH_FORMAT = 'Reply with only one JSON object and no other text, in this shape: {"overview": string, "ranking": [{"id": string, "score": integer from 0 to 100, "reason": string, "gaps": string}]}';
+async function claudePost(body, withFallbacks) {
+  const headers = { 'content-type': 'application/json', 'x-api-key': AI.key, 'anthropic-version': '2026-10-21', 'anthropic-dangerous-direct-browser-access': 'true' };
+  const b = { ...body };
+  // If a safety classifier declines the request, let the API route it to another Claude model.
+  if (withFallbacks) { b.fallbacks = 'default'; headers['anthropic-beta'] = 'server-side-fallback-2026-07-01'; }
+  let res;
+  try { res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', headers, body: JSON.stringify(b) }); }
+  catch (e) { throw new Error('אין חיבור לשירות ה-AI. בדקי את החיבור לאינטרנט ונסי שוב.'); }
+  let data = null; try { data = await res.json(); } catch (e) {}
+  return { res, data };
+}
+// Named claudeApi, never `claude`: a global function called `claude` would overwrite the artifact runtime's window.claude.
+async function claudeApi({ system, content, schema, effort = 'low' }) {
+  if (!aiOn()) throw new Error('עוד לא הוגדר מפתח API במסך ההגדרות');
+  const body = { model: AI.model, max_tokens: 16000, system, messages: [{ role: 'user', content }], output_config: { effort, format: { type: 'json_schema', schema } } };
+  const fb = AI.model !== 'claude-haiku-5-5';
+  let { res, data } = await claudePost(body, fb);
+  if (fb && res.status === 400 && /fallback|beta/i.test(data?.error?.message || '')) ({ res, data } = await claudePost(body, false));
+  if (!res.ok) {
+    if (res.status === 401) throw new Error('מפתח ה-API לא תקין. בדקי אותו במסך ההגדרות.');
+    if (res.status === 403) throw new Error('למפתח ה-API אין הרשאה לפעולה הזו.');
+    if (res.status === 413) throw new Error('התוכן גדול מדי לניתוח בבת אחת. נסי עם פחות תמונות.');
+    if (res.status === 429) throw new Error('יותר מדי בקשות כרגע. נסי שוב בעוד דקה.');
+    if (res.status >= 500) throw new Error('שירות ה-AI עמוס כרגע. נסי שוב בעוד רגע.');
+    throw new Error('שגיאה משירות ה-AI: ' + (data?.error?.message || res.status));
+  }
+  if (data.stop_reason === 'refusal') throw new Error('ה-AI לא עיבד את התוכן הזה. אפשר להשתמש בניתוח הרגיל.');
+  if (data.stop_reason === 'max_tokens') throw new Error('התוכן ארוך מדי לניתוח בבת אחת. נסי לפצל אותו.');
+  const text = (data.content || []).filter(x => x.type === 'text').map(x => x.text).join('');
+  try { return JSON.parse(text); } catch (e) { throw new Error('התקבלה תשובה לא צפויה מה-AI. נסי שוב.'); }
+}
+const STR = { type: 'string' };
+const INTAKE_SCHEMA = { type: 'object', additionalProperties: false,
+  required: ['person_name', 'kind', 'role', 'company', 'phone', 'email', 'meeting_date', 'follow_up_date', 'title', 'summary', 'image_text', 'tag_ids', 'new_tags'],
+  properties: { person_name: STR, kind: { type: 'string', enum: ['mentee', 'mentor', 'contact'] }, role: STR, company: STR, phone: STR, email: STR,
+    meeting_date: STR, follow_up_date: STR, title: STR, summary: STR, image_text: STR,
+    tag_ids: { type: 'array', items: STR }, new_tags: { type: 'array', items: STR } } };
+const INTAKE_SYSTEM = `You work inside a private mentoring CRM used by a finance mentor in Israel. She logs her meetings with mentees, mentors and professional contacts from the accounting and finance world, and later searches these records to match people to job openings and to each other. A record that is accurate and well tagged is what makes those matches work.
+
+You receive the raw material of one meeting: pasted notes, an email, a WhatsApp message, a transcript and/or screenshots. Turn it into one clean record about the other person in the meeting (never about the mentor herself).
+
+Use only what the material says. When the material does not state something, return an empty string for that field rather than guessing, because the mentor trusts these records when she recommends people.
+
+Fields:
+- person_name, role, company, phone, email: the other person's details. Write role and company in Hebrew unless they are proper names in English.
+- kind: "mentee" for someone she guides or helps find work, "mentor" for a senior person who guides others, "contact" for recruiters, employers and other professional contacts.
+- meeting_date: YYYY-MM-DD if the material states or clearly implies the date, otherwise empty.
+- follow_up_date: YYYY-MM-DD only when a concrete follow-up moment is stated (for example "send it by Sunday"), otherwise empty.
+- title: a short Hebrew title for the meeting, up to six words.
+- summary: Hebrew, three to six short lines in the mentor's own voice (first person, feminine): who the person is professionally, what they are looking for, what was agreed, and next steps.
+- image_text: a faithful transcription of all the text in the attached images, in its original language. Empty when there are no images.
+- tag_ids: every tag from the library below that the material clearly supports. Return the ids exactly as written. Map cities to their region tag (for example Netanya belongs to the Sharon region).
+- new_tags: up to three short Hebrew tag names for an important attribute the library lacks. Usually this is an empty list.`;
+const MATCH_SCHEMA = { type: 'object', additionalProperties: false, required: ['overview', 'ranking'],
+  properties: { overview: STR, ranking: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'score', 'reason', 'gaps'],
+    properties: { id: STR, score: { type: 'integer' }, reason: STR, gaps: STR } } } } };
+const MATCH_SYSTEM = `You help a finance mentor in Israel decide who in her private network best fits a request. The request is usually a job description she received, sometimes a few words about the kind of person she is looking for (for example a mentor for one of her mentees). The candidates come from her own CRM and were pre-selected by a keyword search, so some of them will not really fit.
+
+Judge fit by meaning rather than word overlap: someone who ran month-end closing at a software company fits a "high-tech bookkeeper" role even if the words differ. Weigh the role and seniority asked for, hard requirements, location and work mode, availability, and anything in the meeting notes about what the person wants. She will pass your ranking on to recruiters, so a confident recommendation needs evidence in the profile.
+
+Return:
+- ranking: the candidates worth considering, best first. Leave out anyone who clearly does not fit. For each one: id exactly as given; score from 0 to 100 for the fit as a whole; reason, one or two Hebrew sentences she could say out loud, naming concrete evidence from the profile; gaps, in Hebrew, what is missing or should be checked with the person, or an empty string.
+- overview: one Hebrew sentence on the overall picture, for example that there are two strong options and the rest are partial.
+
+Use only the information provided, and write all free text in Hebrew.`;
+const isISO = s => /^\d{4}-\d{2}-\d{2}$/.test(s || '') && !!mkDate(+s.slice(0, 4), +s.slice(5, 7), +s.slice(8, 10));
+
+/* ================= people helpers ================= */
+const KINDS = {
+  mentee:  { label: 'מנטי/ת',      plural: 'מנטיות ומנטים',      cls: 'k-mentee' },
+  mentor:  { label: 'מנטור/ית',    plural: 'מנטוריות ומנטורים',  cls: 'k-mentor' },
+  contact: { label: 'קשר מקצועי', plural: 'קשרים מקצועיים',     cls: 'k-contact' },
+};
+const MTYPES = ['פגישה פרונטלית', 'שיחת זום / טלפון', 'מייל', 'הודעת וואטסאפ', 'צילום מסך', 'תמליל הקלטה', 'סיכום כללי'];
+const AV = [['#F3DCDC','#8E4D57'],['#F1E6D3','#7E6235'],['#E2EBDF','#4F6B4F'],['#E8E2F1','#5E4E7E'],['#DEE8EF','#45657C'],['#F6E2D6','#8A5537']];
+function initials(n) { const p = String(n || '?').trim().split(/\s+/); return (p[0]?.[0] || '') + (p[1]?.[0] || ''); }
+function avatar(p, size = '') { let h = 0; for (const c of p.name || '') h = (h * 31 + c.charCodeAt(0)) >>> 0; const [bg, fg] = AV[h % AV.length]; return `<span class="av ${size}" style="background:${bg};color:${fg}">${esc(initials(p.name))}</span>`; }
+const kindPill = k => `<span class="kind ${KINDS[k]?.cls || ''}">${KINDS[k]?.label || ''}</span>`;
+const kindOpts = sel => Object.entries(KINDS).map(([k, v]) => `<option value="${k}" ${k === sel ? 'selected' : ''}>${v.label}</option>`).join('');
+const digits = s => String(s || '').replace(/[^\d+]/g, '');
+const normPhone = s => { let d = String(s || '').replace(/\D/g, ''); if (d.startsWith('972')) d = '0' + d.slice(3); return d; };
+function followPill(iso) {
+  if (!iso) return '';
+  const d = dayDiff(iso);
+  if (d > 0) return `<span class="pill late">באיחור · ${d === 1 ? 'יום' : d + ' ימים'}</span>`;
+  if (d === 0) return '<span class="pill today">היום</span>';
+  return `<span class="pill">${relDate(iso)}</span>`;
+}
+
+/* ================= modal ================= */
+function openModal(html, { wide = false, stack = false, cls = '' } = {}) {
+  if (!stack) closeAll();
+  const bg = document.createElement('div');
+  bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal${wide ? ' wide' : ''} ${cls}" role="dialog" aria-modal="true">${html}</div>`;
+  bg.addEventListener('mousedown', e => { if (e.target === bg) closeTop(); });
+  $('#modal-root').appendChild(bg);
+  document.body.classList.add('noscroll');
+  return $('.modal', bg);
+}
+function afterModalsClosed() { document.body.classList.remove('noscroll'); if (DIRTY) { DIRTY = false; render(); } }
+function closeTop() { const r = $('#modal-root'); if (!r.lastElementChild) return; r.lastElementChild.remove(); if (!r.children.length) afterModalsClosed(); }
+function closeAll() { const r = $('#modal-root'); if (!r.children.length) return; r.innerHTML = ''; afterModalsClosed(); }
+function confirmBox(msg, ok = 'מחיקה') {
+  return new Promise(res => {
+    const m = openModal(`<h3 class="mh" style="font-size:22px">${msg}</h3><div class="row end"><button class="btn ghost" data-c="0">ביטול</button><button class="btn danger" data-c="1">${ok}</button></div>`, { stack: true });
+    $$('[data-c]', m).forEach(b => b.onclick = () => { closeTop(); res(b.dataset.c === '1'); });
+  });
+}
+
+/* ================= state for views ================= */
+let ROUTE = 'dashboard', PENDING_PERSON = null;
+const P = { q: '', kind: 'all', tags: [], sort: 'recent' };
+const M = { q: '', sel: [], kind: 'all', ran: false };
+let I;
+function resetIntake(keepPerson) {
+  const pid = keepPerson ? I?.personId : '';
+  I = { text: '', files: [], type: MTYPES[0], analyzed: false, det: null, personMode: 'existing', personId: pid || '',
+        newP: { name: '', kind: 'mentee', role: '', company: '', phone: '', email: '', linkedin: '' },
+        date: todayISO(), title: '', tags: [], addToProfile: true, followUp: '', summary: '', newTagSug: [], aiUsed: false };
+}
+resetIntake();
+
+/* ================= router ================= */
+const NAV = [['dashboard','לוח בקרה','home','בית'],['people','אנשים במעגל','users','אנשים'],['intake','קליטת פגישה','inbox','קליטה'],['match','התאמה חכמה','spark','התאמה'],['tags','ספריית תגיות','tag','תגיות'],['backup','גיבוי והגדרות','gear','הגדרות']];
+const VIEWS = {};
+const hashRoute = () => { const r = (location.hash || '').slice(1); return VIEWS[r] ? r : 'dashboard'; };
+function navigate(name) {
+  const r = VIEWS[name] ? name : 'dashboard';
+  try { if (location.hash !== '#' + r) location.hash = r; } catch (e) {}
+  closeAll(); render(r); window.scrollTo(0, 0);
+}
+function render(name) {
+  if (name && VIEWS[name]) ROUTE = name;
+  $$('#nav a').forEach(a => a.classList.toggle('on', a.dataset.r === ROUTE));
+  VIEWS[ROUTE]();
+  if (PENDING_PERSON) { const id = PENDING_PERSON; PENDING_PERSON = null; openPerson(id); }
+}
+function updateNavBadges() { const b = $('#nav a[data-r="people"] .badge'); if (b) b.textContent = S.people.length; }
+const main = () => $('#main');
+
+/* ---------------- dashboard ---------------- */
+VIEWS.dashboard = () => {
+  const h = new Date().getHours();
+  const greet = h < 5 ? 'לילה טוב' : h < 12 ? 'בוקר טוב' : h < 17 ? 'צהריים טובים' : h < 21 ? 'ערב טוב' : 'לילה טוב';
+  const dateStr = new Date().toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const cnt = k => S.people.filter(p => p.kind === k).length;
+  const monthStart = todayISO().slice(0, 8) + '01';
+  const mCount = S.meetings.filter(m => m.date >= monthStart).length;
+  const due = S.people.filter(p => p.followUp && dayDiff(p.followUp) >= -7).sort((a, b) => a.followUp.localeCompare(b.followUp));
+  const recent = [...S.meetings].sort((a, b) => b.date.localeCompare(a.date) || (b.created || 0) - (a.created || 0)).slice(0, 6);
+  const top = [...tagCounts().entries()].sort((a, b) => b[1] - a[1]).slice(0, 22);
+  const stat = (n, l, c) => `<div class="card stat ${c}"><div class="n">${n}</div><div class="lbl">${l}</div></div>`;
+  main().innerHTML = `
+  <div class="ph">
+    <div><div class="eyebrow">${dateStr}</div><h2>${greet} ✿</h2><div class="sub">כאן מתנהל המעגל המקצועי שלך: מנטיות ומנטים, מנטוריות, פגישות והתאמות למשרות.</div></div>
+    <div class="row"><a class="btn soft" href="#match">${ICON.spark} התאמה למשרה</a><a class="btn" href="#intake">${ICON.plus} קליטת פגישה</a></div>
+  </div>
+  ${S.people.length ? '' : `<div class="card welcome"><h3>✿ ברוכה הבאה למעגל</h3>
+    <p class="muted">המעגל שלך עדיין ריק. אפשר להתחיל מיד עם האנשים שלך, או לטעון קודם נתוני דוגמה בדויים כדי להתרשם. את הדוגמה מוחקים בלחיצה במסך ההגדרות.</p>
+    <div class="row"><a class="btn" href="#intake">${ICON.plus} קליטת פגישה ראשונה</a><button class="btn soft" data-act="new-person">הוספת איש/אשת קשר</button><button class="btn ghost" data-act="demo-load">טעינת נתוני דוגמה</button></div></div>`}
+  <div class="grid g4">
+    ${stat(cnt('mentee'), 'מנטיות ומנטים', 'rose')}${stat(cnt('mentor'), 'מנטוריות ומנטורים', 'gold')}${stat(mCount, 'פגישות החודש', 'sage')}${stat(due.length, 'מעקבים לשבוע הקרוב', 'lav')}
+  </div>
+  <div class="grid g2 mt">
+    <div class="card"><h3>${ICON.cal} למעקב השבוע</h3>
+      <div class="list">${due.map(p => `<div class="it" data-act="person" data-id="${p.id}">${avatar(p, 'sm')}<div class="grow"><div class="t1">${esc(p.name)}</div><div class="t2">${esc([p.role, p.company].filter(Boolean).join(' · '))}</div></div>${followPill(p.followUp)}</div>`).join('') || '<div class="empty">אין מעקבים פתוחים לשבוע הקרוב 🌿</div>'}</div>
+    </div>
+    <div class="card"><h3>${ICON.inbox} פגישות אחרונות</h3>
+      <div class="list">${recent.map(m => { const p = S.people.find(x => x.id === m.personId); return p ? `<div class="it" data-act="person" data-id="${p.id}">${avatar(p, 'sm')}<div class="grow"><div class="t1">${esc(p.name)} <span class="muted sm">· ${esc(m.title)}</span></div><div class="t2">${esc(m.type)} · ${relDate(m.date)}</div></div></div>` : ''; }).join('') || '<div class="empty">עוד לא נקלטו פגישות</div>'}</div>
+    </div>
+  </div>
+  <div class="card mt"><h3>${ICON.tag} התגיות במעגל שלך</h3>
+    <div class="tags">${top.map(([id, n]) => chip(id, { count: n, act: 'filter-tag' })).join('') || '<span class="muted">אין עדיין תגיות</span>'}</div>
+    <div class="hint">לחיצה על תגית תציג את כל האנשים שמתויגים בה.</div>
+  </div>`;
+};
+
+/* ---------------- people ---------------- */
+VIEWS.people = () => {
+  main().innerHTML = `
+  <div class="ph">
+    <div><h2>אנשים במעגל</h2><div class="sub">${S.people.length} אנשי קשר: מנטיות ומנטים, מנטוריות וקשרים מקצועיים.</div></div>
+    <button class="btn" data-act="new-person">${ICON.plus} הוספת איש/אשת קשר</button>
+  </div>
+  <div class="card filters">
+    <div class="row">
+      <div class="search"><input class="f" id="pq" placeholder="חיפוש לפי שם, תפקיד, חברה או כל מילה מהפגישות…" value="${esc(P.q)}"></div>
+      <div class="seg" id="pkind">${[['all','הכול'], ...Object.entries(KINDS).map(([k, v]) => [k, v.plural])].map(([k, l]) => `<button data-v="${k}" class="${P.kind === k ? 'on' : ''}">${l}</button>`).join('')}</div>
+      <select class="f" id="psort" style="width:auto">
+        <option value="recent" ${P.sort === 'recent' ? 'selected' : ''}>מיון: פגישה אחרונה</option>
+        <option value="follow" ${P.sort === 'follow' ? 'selected' : ''}>מיון: תאריך מעקב</option>
+        <option value="name" ${P.sort === 'name' ? 'selected' : ''}>מיון: שם</option>
+      </select>
+    </div>
+    <div id="ptags" class="mt"></div>
+  </div>
+  <div id="plist"></div>`;
+  $('#pq').oninput = e => { P.q = e.target.value; drawPeople(); };
+  $$('#pkind button').forEach(b => b.onclick = () => { P.kind = b.dataset.v; $$('#pkind button').forEach(x => x.classList.toggle('on', x === b)); drawPeople(); });
+  $('#psort').onchange = e => { P.sort = e.target.value; drawPeople(); };
+  mountTagPicker($('#ptags'), { get: () => P.tags, set: v => { P.tags = v; drawPeople(); }, placeholder: 'סינון לפי תגיות (למשל: איזור צפון, רו"ח)…', allowCreate: false });
+  drawPeople();
+};
+function drawPeople() {
+  const box = $('#plist'); if (!box) return;
+  const qw = normText(P.q).split(/\s+/).filter(Boolean);
+  let list = S.people.filter(p => {
+    if (P.kind !== 'all' && p.kind !== P.kind) return false;
+    if (P.tags.some(t => !p.tags.includes(t))) return false;
+    if (!qw.length) return true;
+    const hay = normText([p.name, p.role, p.company, p.notes, p.email, p.tags.map(id => TAGMAP.get(id)?.label).join(' '), meetingsOf(p.id).map(m => m.title + ' ' + m.text).join(' ')].join(' '));
+    return qw.every(w => hay.includes(w));
+  });
+  if (P.sort === 'name') list.sort(byName);
+  else if (P.sort === 'follow') list.sort((a, b) => (a.followUp || '9999').localeCompare(b.followUp || '9999'));
+  else list.sort((a, b) => lastMeeting(b.id).localeCompare(lastMeeting(a.id)));
+  box.innerHTML = list.length ? `<div class="pgrid">${list.map(p => {
+    const tags = sortTags(p.tags), last = lastMeeting(p.id);
+    return `<div class="card pcard" data-act="person" data-id="${p.id}">
+      <div class="top">${avatar(p)}<div class="who"><div class="nm">${esc(p.name)}</div><div class="rl">${esc([p.role, p.company].filter(Boolean).join(' · ') || '—')}</div></div>${kindPill(p.kind)}</div>
+      <div class="tags">${tags.slice(0, 6).map(id => chip(id)).join('')}${tags.length > 6 ? `<span class="tag c-stone">+${tags.length - 6}</span>` : ''}</div>
+      <div class="meta"><span>${last ? 'פגישה אחרונה ' + relDate(last) : 'עדיין לא נקלטו פגישות'}</span>${p.followUp ? `<span class="${dayDiff(p.followUp) >= 0 ? 'due' : ''}">מעקב: ${relDate(p.followUp)}</span>` : ''}</div>
+    </div>`; }).join('')}</div>` : '<div class="card mt"><div class="empty">לא נמצאו אנשים שמתאימים לסינון 🌸</div></div>';
+}
+
+/* ---------------- person modal ---------------- */
+function openPerson(id) { const p = S.people.find(x => x.id === id); if (!p) return; drawPerson(p, openModal('', { wide: true })); }
+function drawPerson(p, box) {
+  const ms = meetingsOf(p.id);
+  const li = p.linkedin ? (/^https?:/i.test(p.linkedin) ? p.linkedin : 'https://' + p.linkedin) : '';
+  box.innerHTML = `<button class="close" data-act="close" aria-label="סגירה">×</button>
+  <div class="phead">${avatar(p, 'lg')}<div>
+    <div class="row">${kindPill(p.kind)}</div>
+    <h2>${esc(p.name)}</h2>
+    <div class="rl">${esc([p.role, p.company].filter(Boolean).join(' · '))}</div>
+    <div class="row contact">
+      ${p.phone ? `<a href="tel:${esc(digits(p.phone))}">${ICON.phone}<span dir="ltr">${esc(p.phone)}</span></a>` : ''}
+      ${p.email ? `<a href="mailto:${esc(p.email)}">${ICON.mail}<span dir="ltr">${esc(p.email)}</span></a>` : ''}
+      ${li ? `<a href="${esc(li)}" target="_blank" rel="noopener">${ICON.link}לינקדאין</a>` : ''}
+    </div>
+  </div></div>
+  <div class="row" style="margin-bottom:20px">
+    <button class="btn sm" data-act="add-meeting" data-id="${p.id}">${ICON.plus} קליטת פגישה</button>
+    <button class="btn sm ghost" data-act="edit-person" data-id="${p.id}">${ICON.edit} עריכת פרטים</button>
+    <button class="btn sm ghost" data-act="del-person" data-id="${p.id}">${ICON.trash} מחיקה</button>
+  </div>
+  <div class="grid g2 tight">
+    <div class="field"><label class="l">תגיות</label><div id="pt-tags"></div></div>
+    <div class="field"><label class="l">תאריך למעקב</label><input type="date" class="f" id="pt-follow" value="${p.followUp || ''}"></div>
+  </div>
+  <div class="field"><label class="l">הערות כלליות</label><textarea class="f" id="pt-notes" rows="3" placeholder="מה חשוב לזכור עליה/עליו…">${esc(p.notes || '')}</textarea></div>
+  <h3 class="sec mt">היסטוריית פגישות <span class="muted sm">(${ms.length})</span></h3>
+  ${ms.length ? `<div class="tl">${ms.map(m => `
+    <div class="tli">
+      <div class="tl-h"><b>${esc(m.title)}</b><span class="muted">${fmtDate(m.date)} · ${esc(m.type)}</span><button class="icon-btn del" data-act="del-meeting" data-id="${m.id}" title="מחיקת הפגישה">${ICON.trash}</button></div>
+      ${m.text ? `<div class="txt">${esc(m.text)}</div>` : ''}
+      ${m.text && (m.text.length > 260 || m.text.split('\n').length > 4) ? '<button class="link" data-act="expand">הצגת הכל ▾</button>' : ''}
+      ${m.attachments?.length ? `<div class="atts">${m.attachments.map((a, i) => `<img src="${a.dataUrl}" alt="${esc(a.name)}" data-act="img-view" data-mid="${m.id}" data-i="${i}">`).join('')}</div>` : ''}
+      ${m.tags?.length ? `<div class="tags" style="margin-top:8px">${sortTags(m.tags).map(id => chip(id)).join('')}</div>` : ''}
+    </div>`).join('')}</div>` : '<div class="empty">עוד לא נקלטו פגישות. לחצי על "קליטת פגישה" כדי להתחיל.</div>'}`;
+  mountTagPicker($('#pt-tags', box), { get: () => p.tags, set: v => { p.tags = v; save(); } });
+  $('#pt-follow', box).onchange = e => { p.followUp = e.target.value; save(); };
+  $('#pt-notes', box).onchange = e => { p.notes = e.target.value; save(); };
+}
+function openPersonForm(p) {
+  const isNew = !p;
+  const d = p || { name: '', kind: 'mentee', role: '', company: '', phone: '', email: '', linkedin: '', notes: '', tags: [] };
+  let tags = [...(d.tags || [])];
+  const fld = (label, id, val, type = 'text') => `<div class="field"><label class="l">${label}</label><input class="f" id="${id}" type="${type}" value="${esc(val || '')}" ${type === 'tel' || type === 'email' || type === 'url' ? 'dir="ltr"' : ''}></div>`;
+  const m = openModal(`<button class="close" data-act="close" aria-label="סגירה">×</button>
+    <h2 class="mh">${isNew ? 'הוספה למעגל' : 'עריכת פרטים'}</h2>
+    <div class="grid g2 tight">
+      ${fld('שם מלא *', 'fn', d.name)}
+      <div class="field"><label class="l">סוג הקשר</label><select class="f" id="fk">${kindOpts(d.kind)}</select></div>
+      ${fld('תפקיד', 'fr', d.role)}${fld('חברה / ארגון', 'fc', d.company)}
+      ${fld('טלפון', 'fp', d.phone, 'tel')}${fld('מייל', 'fe', d.email, 'email')}
+    </div>
+    ${fld('קישור ללינקדאין', 'fl', d.linkedin, 'url')}
+    ${isNew ? '<div class="field"><label class="l">תגיות</label><div id="ftags"></div></div>' : ''}
+    <div class="field"><label class="l">הערות</label><textarea class="f" id="fnotes" rows="3">${esc(d.notes || '')}</textarea></div>
+    <div class="row end"><button class="btn ghost" data-act="close">ביטול</button><button class="btn" id="fsave">${ICON.check} שמירה</button></div>`, { stack: !isNew });
+  if (isNew) mountTagPicker($('#ftags', m), { get: () => tags, set: v => { tags = v; } });
+  $('#fsave', m).onclick = () => {
+    const v = id => $('#' + id, m).value.trim();
+    if (!v('fn')) { toast('נא למלא שם'); $('#fn', m).focus(); return; }
+    const obj = isNew ? { id: uid(), created: Date.now(), followUp: '', tags } : p;
+    Object.assign(obj, { name: v('fn'), kind: $('#fk', m).value, role: v('fr'), company: v('fc'), phone: v('fp'), email: v('fe'), linkedin: v('fl'), notes: $('#fnotes', m).value.trim() });
+    if (isNew) S.people.push(obj);
+    save(); closeAll(); openPerson(obj.id);
+    toast(isNew ? 'נוסף/ה למעגל ✓' : 'הפרטים עודכנו ✓');
+  };
+  setTimeout(() => $('#fn', m)?.focus(), 60);
+}
+
+/* ---------------- intake ---------------- */
+VIEWS.intake = () => {
+  main().innerHTML = `
+  <div class="ph"><div><h2>קליטת פגישה</h2><div class="sub">הדביקי סיכום פגישה, מייל, הודעה או תמליל, או גררי צילומי מסך. המערכת תזהה את הפרטים ותציע תגיות.</div></div></div>
+  <div class="grid intake">
+    <div class="card">
+      <h3><span class="num">1</span> התוכן</h3>
+      <div class="field"><label class="l">סוג המקור</label><select class="f" id="itype">${MTYPES.map(t => `<option ${t === I.type ? 'selected' : ''}>${t}</option>`).join('')}</select></div>
+      <textarea class="f big" id="itext" placeholder="הדביקי כאן את סיכום הפגישה, המייל, הודעת הוואטסאפ או התמליל…">${esc(I.text)}</textarea>
+      <div class="drop" id="idrop">${ICON.upload}<div><b>גררי לכאן קבצים</b> או <u>לחצי לבחירה</u></div>
+        <small>צילומי מסך ותמונות (זיהוי טקסט בעברית ובאנגלית) · מיילים ‎.eml · תמלילים ‎.txt / .vtt / .srt<br>אפשר גם להדביק צילום מסך ישירות עם Ctrl+V</small>
+        <input type="file" id="ifile" multiple hidden accept="image/*,.eml,.txt,.vtt,.srt,.md,.csv">
+      </div>
+      <div class="files" id="ifiles"></div>
+      <div class="row between mt"><button class="btn ghost" data-act="intake-clear">ניקוי</button>
+        ${aiOn() ? `<div class="row"><button class="btn ghost" data-act="intake-analyze">ניתוח רגיל</button><button class="btn" data-act="intake-ai">${ICON.spark} ניתוח עם AI</button></div>` : `<button class="btn" data-act="intake-analyze">${ICON.spark} ניתוח התוכן</button>`}</div>
+    </div>
+    <div class="card" id="iresult"></div>
+  </div>`;
+  $('#itext').oninput = e => { I.text = e.target.value; };
+  $('#itype').onchange = e => { I.type = e.target.value; };
+  const drop = $('#idrop'), fi = $('#ifile');
+  drop.onclick = e => { if (e.target !== fi) fi.click(); };
+  fi.onchange = () => { addFiles([...fi.files]); fi.value = ''; };
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => addFiles([...e.dataTransfer.files]));
+  drawFiles(); drawIntakeResult();
+};
+function setIntakeText(t) { I.text = t; const ta = $('#itext'); if (ta) ta.value = t; }
+function appendText(txt, label) { setIntakeText((I.text.trim() ? I.text.trimEnd() + '\n\n' : '') + (label ? `— ${label} —\n` : '') + txt.trim()); }
+
+async function addFiles(list) {
+  for (const f of list) {
+    const n = f.name.toLowerCase();
+    try {
+      if (f.type.startsWith('image/')) {
+        // In a Claude artifact the on-device text engine cannot load, so images are read by the AI only.
+        const item = { id: uid(), name: f.name || 'צילום מסך', dataUrl: await resizeImage(f), status: aiOn() ? 'ai' : HOSTED ? 'noocr' : 'ocr', progress: 0, file: f };
+        I.files.push(item); drawFiles(); if (item.status === 'ocr') ocrImage(f, item);
+        if (I.type === MTYPES[0]) { I.type = 'צילום מסך'; const s = $('#itype'); if (s) s.value = I.type; }
+      } else if (n.endsWith('.eml')) {
+        const e = parseEml(await f.text());
+        appendText([e.from && `מאת: ${e.from}`, e.subject && `נושא: ${e.subject}`, e.date && `תאריך: ${e.date}`].filter(Boolean).join('\n') + '\n\n' + e.body, f.name);
+        I.type = 'מייל'; const s = $('#itype'); if (s) s.value = I.type;
+      } else if (/\.(vtt|srt)$/.test(n)) {
+        appendText(cleanSubs(await f.text()), f.name);
+        I.type = 'תמליל הקלטה'; const s = $('#itype'); if (s) s.value = I.type;
+      } else if (/\.(txt|md|csv|text)$/.test(n) || f.type.startsWith('text/')) {
+        appendText(await f.text(), f.name);
+      } else if (/\.msg$/.test(n)) {
+        toast('קבצי Outlook ‎.msg לא נתמכים – אפשר לשמור את המייל כ-‎.eml או להעתיק את הטקסט');
+      } else toast('סוג קובץ שעדיין לא נתמך: ' + f.name);
+    } catch (err) { console.error(err); toast('לא הצלחתי לקרוא את הקובץ ' + f.name); }
+  }
+}
+function drawFiles() {
+  const box = $('#ifiles'); if (!box) return;
+  const st = f => f.status === 'loading' ? 'טוען את מנוע זיהוי הטקסט…'
+    : f.status === 'ocr' ? `<span class="bar"><i id="bar-${f.id}" style="width:${Math.round((f.progress || 0) * 100)}%"></i></span>מזהה טקסט…`
+    : f.status === 'noocr' ? 'קריאת טקסט מתמונה זמינה כאן רק עם AI'
+    : f.status === 'ai' ? 'ה-AI יקרא את התמונה בזמן הניתוח' : f.status === 'aidone' ? '✓ נקרא על ידי ה-AI'
+    : f.status === 'done' ? '✓ הטקסט נוסף לתוכן' : f.status === 'empty' ? 'לא נמצא טקסט בתמונה' : f.status === 'fail' ? 'הזיהוי לא הצליח – התמונה תישמר כצרופה' : '';
+  box.innerHTML = I.files.map(f => `<div class="fth">${f.dataUrl ? `<img src="${f.dataUrl}" alt="">` : ''}<div class="fst">${st(f)}</div><button class="x" data-act="file-rm" data-id="${f.id}" aria-label="הסרה">×</button></div>`).join('');
+}
+function resizeImage(file, max = 1400, q = 0.8) {
+  return new Promise(res => {
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', q));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); res(null); };
+    img.src = url;
+  });
+}
+/* OCR — Tesseract.js runs inside the browser; the image is not uploaded anywhere. */
+let tessLib = null, tessWorker = null, ocrCurrent = null, ocrChain = Promise.resolve();
+function loadTess() {
+  if (tessLib) return tessLib;
+  tessLib = new Promise((res, rej) => { const s = document.createElement('script'); s.crossOrigin = 'anonymous'; s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js'; s.onload = () => res(window.Tesseract); s.onerror = () => { tessLib = null; rej(new Error('tesseract load failed')); }; document.head.appendChild(s); });
+  return tessLib;
+}
+async function getWorker() {
+  if (!tessWorker) tessWorker = (async () => { const T = await loadTess(); return T.createWorker(['heb', 'eng'], 1, { logger: m => { if (ocrCurrent && m.status === 'recognizing text') { ocrCurrent.progress = m.progress; const b = $('#bar-' + ocrCurrent.id); if (b) b.style.width = Math.round(m.progress * 100) + '%'; } } }); })();
+  try { return await tessWorker; } catch (e) { tessWorker = null; throw e; }
+}
+function ocrImage(file, item) {
+  ocrChain = ocrChain.then(async () => {
+    try {
+      if (!tessWorker) { item.status = 'loading'; drawFiles(); }
+      const w = await getWorker();
+      item.status = 'ocr'; ocrCurrent = item; drawFiles();
+      const { data } = await w.recognize(file);
+      const txt = (data.text || '').replace(/[ \t]+\n/g, '\n').trim();
+      if (!I.files.includes(item)) return;
+      if (txt) { item.status = 'done'; appendText(txt, 'טקסט מתוך ' + item.name); } else item.status = 'empty';
+    } catch (e) { console.error(e); item.status = 'fail'; toast('זיהוי טקסט מתמונה דורש חיבור לאינטרנט בפעם הראשונה'); }
+    ocrCurrent = null; drawFiles();
+  });
+}
+/* email / subtitles parsing */
+function qpBytes(s) { const out = []; for (let i = 0; i < s.length; i++) { if (s[i] === '=' && /^[0-9A-Fa-f]{2}$/.test(s.substr(i + 1, 2))) { out.push(parseInt(s.substr(i + 1, 2), 16)); i += 2; } else out.push(s.charCodeAt(i) & 0xff); } return new Uint8Array(out); }
+function decodeWords(s) {
+  return s.replace(/\?=\s+=\?/g, '?==?').replace(/=\?([^?]+)\?([BbQq])\?([^?]*)\?=/g, (m, cs, enc, txt) => {
+    try { const bytes = enc.toUpperCase() === 'B' ? Uint8Array.from(atob(txt), c => c.charCodeAt(0)) : qpBytes(txt.replace(/_/g, ' ')); return new TextDecoder(cs).decode(bytes); } catch (e) { return m; }
+  });
+}
+function htmlToText(html) {
+  const doc = new DOMParser().parseFromString(html.replace(/<(br|\/p|\/div|\/li|\/tr|\/h\d)[^>]*>/gi, '$&\n'), 'text/html');
+  return (doc.body?.textContent || '').replace(/\n{3,}/g, '\n\n').trim();
+}
+function decodeBody(b, cte, ct) {
+  const cs = (ct.match(/charset="?([^";\s]+)/i) || [])[1] || 'utf-8';
+  try {
+    if (/base64/i.test(cte)) return new TextDecoder(cs).decode(Uint8Array.from(atob(b.replace(/\s+/g, '')), c => c.charCodeAt(0)));
+    if (/quoted/i.test(cte)) return new TextDecoder(cs).decode(qpBytes(b.replace(/=\n/g, '')));
+  } catch (e) {}
+  return b;
+}
+function extractPart(ct, cte, body) {
+  const bm = ct.match(/boundary="?([^";]+)"?/i);
+  if (/multipart/i.test(ct) && bm) {
+    let html = '';
+    for (const part of body.split('--' + bm[1]).slice(1)) {
+      if (part.startsWith('--')) break;
+      const i = part.indexOf('\n\n'); if (i < 0) continue;
+      const ph = part.slice(0, i).replace(/\n[ \t]+/g, ' '), pb = part.slice(i + 2);
+      const pct = (ph.match(/content-type:\s*([^\n]+)/i) || [])[1] || 'text/plain';
+      const pcte = (ph.match(/content-transfer-encoding:\s*([^\n]+)/i) || [])[1] || '';
+      if (/multipart/i.test(pct)) { const r = extractPart(pct, pcte, pb); if (r) return r; }
+      else if (/text\/plain/i.test(pct)) return decodeBody(pb, pcte, pct).trim();
+      else if (/text\/html/i.test(pct) && !html) html = decodeBody(pb, pcte, pct);
+    }
+    return html ? htmlToText(html) : '';
+  }
+  const d = decodeBody(body, cte, ct);
+  return /text\/html/i.test(ct) ? htmlToText(d) : d.trim();
+}
+function parseEml(raw) {
+  raw = raw.replace(/\r\n/g, '\n');
+  const cut = raw.indexOf('\n\n');
+  const head = raw.slice(0, cut).replace(/\n[ \t]+/g, ' '), body = raw.slice(cut + 2);
+  const h = n => { const m = head.match(new RegExp('^' + n + ':\\s*(.*)$', 'im')); return m ? decodeWords(m[1].trim()) : ''; };
+  return { from: h('From'), subject: h('Subject'), date: h('Date'), body: extractPart(h('Content-Type'), h('Content-Transfer-Encoding'), body) };
+}
+function cleanSubs(t) {
+  return t.replace(/\r/g, '').split('\n').filter(l => !/^WEBVTT/.test(l) && !/-->/.test(l) && !/^\d+$/.test(l.trim()) && !/^NOTE\b/.test(l))
+    .join('\n').replace(/<v ([^>]+)>/g, '$1: ').replace(/<[^>]+>/g, '').replace(/\n{2,}/g, '\n').trim();
+}
+/* detection of details */
+const PHONE_RX = /(?:\+972[\s-]?|0)(?:5\d|7\d|[23489])[\s-]?\d{3}[\s-]?\d{4}/g;
+function mkDate(y, mo, d) { return (mo < 1 || mo > 12 || d < 1 || d > 31 || y < 2000 || y > 2100) ? null : `${y}-${pad(mo)}-${pad(d)}`; }
+function parseLooseDate(s) {
+  let m = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return mkDate(+m[1], +m[2], +m[3]);
+  m = s.match(/(\d{1,2})[./](\d{1,2})[./](\d{2,4})/); if (m) { let y = +m[3]; if (y < 100) y += 2000; return mkDate(y, +m[2], +m[1]); }
+  if (s.length < 60 && /[a-z]{3}/i.test(s)) { const t = Date.parse(s.trim()); if (!isNaN(t)) return isoDate(new Date(t)); }
+  return null;
+}
+function findDate(t) { const hm = t.match(/^(?:date|תאריך)\s*:\s*(.+)$/im); return (hm && parseLooseDate(hm[1])) || parseLooseDate(t); }
+
+function analyzeIntake(silent = false) {
+  const ta = $('#itext'); if (ta) I.text = ta.value;
+  const t = I.text;
+  if (!t.trim()) {
+    if (!silent) toast(I.files.some(f => f.status === 'ocr' || f.status === 'loading') ? 'רגע, הטקסט מהתמונה עדיין מזוהה…'
+      : I.files.some(f => f.status === 'ai') ? 'לקריאת תמונות לחצי על "ניתוח עם AI"' : 'אין עדיין תוכן לניתוח – הדביקי טקסט או הוסיפי קובץ');
+    return false;
+  }
+  if (!silent && I.files.some(f => f.status === 'ocr' || f.status === 'loading')) toast('שימי לב: זיהוי הטקסט מחלק מהתמונות עדיין רץ');
+  const emails = [...new Set((t.match(/[\w.+-]+@[\w-]+\.[\w.-]+/g) || []).map(s => s.toLowerCase().replace(/\.$/, '')))];
+  const phones = [...new Set((t.match(PHONE_RX) || []).map(normPhone))];
+  const li = (t.match(/(?:https?:\/\/)?(?:[a-z]{2,3}\.)?linkedin\.com\/in\/[^\s)>\]]+/i) || [])[0] || '';
+  const subj = (t.match(/^(?:נושא|subject)\s*:\s*(.+)$/im) || [])[1] || '';
+  const fromName = ((t.match(/^(?:מאת|from)\s*:\s*"?([^"<\n@]+?)"?\s*(?:<|$)/im) || [])[1] || '').trim();
+  const nameLine = ((t.match(/^(?:שם מלא|שם|name)\s*:\s*(.+)$/im) || [])[1] || '').trim();
+  const tags = detectTags(t);
+  let match = null, why = '';
+  for (const p of S.people) if (p.email && emails.includes(p.email.toLowerCase())) { match = p; why = 'לפי כתובת המייל'; break; }
+  if (!match) for (const p of S.people) if (p.phone && phones.includes(normPhone(p.phone))) { match = p; why = 'לפי מספר הטלפון'; break; }
+  if (!match) { const nt = normText(t); const c = S.people.filter(p => p.name && nt.includes(normText(p.name))); if (c.length === 1) { match = c[0]; why = 'לפי השם שמופיע בטקסט'; } }
+  I.det = { emails, phones, li, why, matchId: match?.id || null };
+  if (!(I.personMode === 'existing' && I.personId && !match)) {
+    if (match) { I.personMode = 'existing'; I.personId = match.id; }
+    else if (!I.personId) I.personMode = 'new';
+  }
+  const roleTag = tags.map(id => TAGMAP.get(id)).find(x => x.cat === 'role' && x.label !== 'מנהל/ת חשבונות') || tags.map(id => TAGMAP.get(id)).find(x => x.cat === 'role');
+  I.newP = { name: nameLine || fromName, kind: 'mentee', role: roleTag?.label || '', company: '', phone: ((t.match(PHONE_RX) || [])[0] || '').trim(), email: emails[0] || '', linkedin: li };
+  I.date = findDate(t) || I.date || todayISO();
+  I.title = subj || I.title;
+  I.tags = tags;
+  I.analyzed = true;
+  if (!silent) { I.aiUsed = false; drawIntakeResult(); }
+  return true;
+}
+async function analyzeIntakeAI(btn) {
+  const ta = $('#itext'); if (ta) I.text = ta.value;
+  const imgs = I.files.filter(f => f.dataUrl && f.status !== 'done' && f.status !== 'aidone');
+  if (!I.text.trim() && !imgs.length) { toast('אין עדיין תוכן לניתוח – הדביקי טקסט או הוסיפי תמונה'); return; }
+  const maxImg = SAMPLE ? (SAMPLE_LIM?.images?.maxCount || 0) : 10;
+  if (imgs.length && !maxImg) { toast(SAMPLE_MSG.images_unavailable, 5000); return; }
+  if (imgs.length > maxImg) { toast(`אפשר לנתח עד ${maxImg} תמונות בפגישה אחת. הסירי חלק מהן ונסי שוב.`, 5000); return; }
+  const done = busy(btn, 'ה-AI קורא את התוכן…');
+  try {
+    const lib = S.tags.map(t => `${t.id} | ${t.label} | ${catOf(t.cat).name}`).join('\n');
+    const r = await aiJSON({ system: `${INTAKE_SYSTEM}\n\nTag library (id | tag | category):\n${lib}`, schema: INTAKE_SCHEMA, format: INTAKE_FORMAT, effort: 'low',
+      files: imgs.map(f => f.file).filter(Boolean), dataUrls: imgs.map(f => f.dataUrl),
+      text: `Source type: ${I.type}\nToday's date: ${todayISO()}\n\nMaterial:\n${I.text.trim() || '(no text was pasted; the material is in the attached images)'}` });
+    const v = s => (typeof s === 'string' ? s.trim() : '');
+    if (v(r.image_text) && imgs.length) { appendText(v(r.image_text), 'טקסט מתוך התמונות'); imgs.forEach(f => { f.status = 'aidone'; }); drawFiles(); }
+    // local pass first (emails, phones, recognising someone already in the circle), then the AI's reading on top
+    if (!analyzeIntake(true)) { I.det = { emails: [], phones: [], li: '', why: '', matchId: null }; I.newP = { name: '', kind: 'mentee', role: '', company: '', phone: '', email: '', linkedin: '' }; I.tags = []; }
+    const np = I.newP;
+    if (v(r.person_name)) np.name = v(r.person_name);
+    if (v(r.role)) np.role = v(r.role);
+    if (v(r.company)) np.company = v(r.company);
+    if (v(r.phone) && !np.phone) np.phone = v(r.phone);
+    if (v(r.email) && !np.email) np.email = v(r.email);
+    if (KINDS[r.kind]) np.kind = r.kind;
+    const aiTags = (Array.isArray(r.tag_ids) ? r.tag_ids : []).filter(id => TAGMAP.has(id));
+    if (aiTags.length) I.tags = sortTags(aiTags);
+    I.newTagSug = (Array.isArray(r.new_tags) ? r.new_tags : []).map(v).map(l => l.replace(/^#/, '')).filter(l => l && !S.tags.some(t => normText(t.label) === normText(l))).slice(0, 3);
+    I.summary = v(r.summary);
+    if (v(r.title)) I.title = v(r.title);
+    if (isISO(v(r.meeting_date))) I.date = v(r.meeting_date);
+    if (isISO(v(r.follow_up_date))) I.followUp = v(r.follow_up_date);
+    if (!I.det.matchId && np.name) {
+      const c = S.people.filter(p => normText(p.name) === normText(np.name));
+      if (c.length === 1) { I.det.matchId = c[0].id; I.det.why = 'לפי השם'; I.personMode = 'existing'; I.personId = c[0].id; }
+    }
+    if (!I.personId) I.personMode = 'new';
+    I.analyzed = true; I.aiUsed = true;
+    drawIntakeResult();
+    $('#iresult')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (e) { console.error(e); toast(e.message || 'משהו השתבש בניתוח', 6000); }
+  finally { done(); }
+}
+function drawIntakeResult() {
+  const box = $('#iresult'); if (!box) return;
+  if (!I.analyzed) {
+    box.innerHTML = `<h3><span class="num">2</span> שיוך ותגיות</h3>
+      <div class="howto">
+        <div class="hstep"><span>${ICON.inbox}</span><div><b>מוסיפות תוכן</b><p>סיכום, מייל, הודעת וואטסאפ, תמליל או צילום מסך. כל פורמט עובד.</p></div></div>
+        <div class="hstep"><span>${ICON.spark}</span><div><b>המערכת מזהה</b><p>שם, מייל, טלפון, תאריך ונושא, וגם תגיות מקצועיות: תפקיד, איזור, רקע, מערכות וכישורים.</p></div></div>
+        <div class="hstep"><span>${ICON.users}</span><div><b>משייכות ושומרות</b><p>לאיש/אשת קשר שכבר במעגל (זיהוי אוטומטי לפי מייל, טלפון או שם) או לחדש/ה.</p></div></div>
+      </div>
+      ${I.personId ? `<div class="note">הפגישה תשויך ל<b>${esc(personName(I.personId))}</b></div>` : ''}
+      <button class="btn soft" data-act="intake-demo">${ICON.mail} נסי עם מייל לדוגמה</button>`;
+    return;
+  }
+  const d = I.det || {};
+  const found = [d.emails?.length ? `${d.emails.length} כתובות מייל` : '', d.phones?.length ? `${d.phones.length} טלפון` : '', `${I.tags.length} תגיות`].filter(Boolean).join(' · ');
+  const groups = Object.entries(KINDS).map(([k, v]) => { const ps = S.people.filter(p => p.kind === k).sort(byName); return ps.length ? `<optgroup label="${v.plural}">${ps.map(p => `<option value="${p.id}" ${p.id === I.personId ? 'selected' : ''}>${esc(p.name)}${p.role ? ' – ' + esc(p.role) : ''}</option>`).join('')}</optgroup>` : ''; }).join('');
+  const np = I.newP;
+  const npf = (lbl, k, type = 'text') => `<div class="field"><label class="l">${lbl}</label><input class="f" data-np="${k}" type="${type}" value="${esc(np[k] || '')}" ${type !== 'text' ? 'dir="ltr"' : ''}></div>`;
+  box.innerHTML = `<h3><span class="num">2</span> שיוך ותגיות</h3>
+    <div class="note ok">${I.aiUsed ? '✨ נותח עם AI' : '✓ התוכן נותח'} · זוהו ${found}</div>
+    <div class="field"><label class="l">למי שייכת הפגישה?</label>
+      <div class="seg" id="ipm"><button data-v="existing" class="${I.personMode === 'existing' ? 'on' : ''}">כבר במעגל</button><button data-v="new" class="${I.personMode === 'new' ? 'on' : ''}">חדש/ה במעגל</button></div></div>
+    ${I.personMode === 'existing'
+      ? `<div class="field"><select class="f" id="ipsel"><option value="">בחרי מהרשימה…</option>${groups}</select>${d.matchId && d.matchId === I.personId ? `<div class="hint ok">✓ זוהה/תה אוטומטית ${esc(d.why)}</div>` : ''}</div>`
+      : `<div class="grid g2 tight">${npf('שם מלא *', 'name')}<div class="field"><label class="l">סוג הקשר</label><select class="f" data-np="kind">${kindOpts(np.kind)}</select></div>${npf('תפקיד', 'role')}${npf('חברה / ארגון', 'company')}${npf('טלפון', 'phone', 'tel')}${npf('מייל', 'email', 'email')}</div>`}
+    <div class="grid g2 tight">
+      <div class="field"><label class="l">תאריך הפגישה</label><input type="date" class="f" id="idate" value="${I.date}"></div>
+      <div class="field"><label class="l">תאריך למעקב <small>(לא חובה)</small></label><input type="date" class="f" id="ifollow" value="${I.followUp}"></div>
+    </div>
+    <div class="field"><label class="l">כותרת</label><input class="f" id="ititle" value="${esc(I.title)}" placeholder="לדוגמה: שיחת היכרות"></div>
+    ${I.summary ? `<div class="field"><label class="l">סיכום AI <small>· אפשר לערוך</small></label><textarea class="f" id="isum" rows="6">${esc(I.summary)}</textarea></div>` : ''}
+    <div class="field"><label class="l">תגיות שזוהו <small>· אפשר להסיר ולהוסיף</small></label><div id="itags"></div>
+      ${I.newTagSug?.length ? `<div class="hint">ה-AI מציע תגיות חדשות:${I.newTagSug.map((l, i) => `<button class="sug" data-act="sug-tag" data-i="${i}">+ #${esc(l)}</button>`).join('')}</div>` : ''}</div>
+    <label class="chk"><input type="checkbox" id="iprof" ${I.addToProfile ? 'checked' : ''}> להוסיף את התגיות גם לפרופיל</label>
+    <div class="row end mt"><button class="btn" data-act="intake-save">${ICON.check} שמירת הפגישה</button></div>`;
+  $$('#ipm button').forEach(b => b.onclick = () => { I.personMode = b.dataset.v; drawIntakeResult(); });
+  const sel = $('#ipsel'); if (sel) sel.onchange = e => { I.personId = e.target.value; };
+  $$('[data-np]', box).forEach(el => { const k = el.dataset.np; el.oninput = el.onchange = () => { I.newP[k] = el.value; }; });
+  $('#idate').onchange = e => { I.date = e.target.value; };
+  $('#ifollow').onchange = e => { I.followUp = e.target.value; };
+  $('#ititle').oninput = e => { I.title = e.target.value; };
+  const sum = $('#isum'); if (sum) sum.oninput = e => { I.summary = e.target.value; };
+  $('#iprof').onchange = e => { I.addToProfile = e.target.checked; };
+  mountTagPicker($('#itags'), { get: () => I.tags, set: v => { I.tags = v; } });
+}
+function saveIntake() {
+  let p;
+  if (I.personMode === 'existing') {
+    p = S.people.find(x => x.id === I.personId);
+    if (!p) { toast('בחרי למי לשייך את הפגישה'); return; }
+  } else {
+    if (!I.newP.name.trim()) { toast('נא למלא את שם איש/אשת הקשר'); $('[data-np="name"]')?.focus(); return; }
+    p = { id: uid(), created: Date.now(), followUp: '', notes: '', tags: [], ...I.newP, name: I.newP.name.trim() };
+    S.people.push(p);
+  }
+  const m = { id: uid(), personId: p.id, date: I.date || todayISO(), type: I.type, title: I.title.trim() || `${I.type} עם ${p.name}`,
+              text: I.summary.trim() ? (I.summary.trim() + (I.text.trim() ? '\n\n— התוכן המקורי —\n' + I.text.trim() : '')) : I.text.trim(), tags: [...I.tags],
+              attachments: CLOUD ? [] : I.files.filter(f => f.dataUrl).map(f => ({ name: f.name, dataUrl: f.dataUrl })), created: Date.now() };
+  const droppedImages = !!CLOUD && I.files.some(f => f.dataUrl);
+  S.meetings.push(m);
+  if (I.addToProfile) p.tags = sortTags([...p.tags, ...I.tags]);
+  if (I.followUp) p.followUp = I.followUp;
+  if (I.det) { if (!p.email && I.det.emails[0]) p.email = I.det.emails[0]; if (!p.phone && I.det.phones[0]) p.phone = I.det.phones[0]; if (!p.linkedin && I.det.li) p.linkedin = I.det.li; }
+  save(); resetIntake();
+  toast(`הפגישה נשמרה בתיק של ${p.name} ✓` + (droppedImages ? ' התמונות עצמן לא נשמרות, רק הטקסט שנקרא מהן.' : ''), droppedImages ? 5500 : 3000);
+  PENDING_PERSON = p.id; navigate('people');
+}
+
+/* ---------------- match ---------------- */
+const DEMO_JD = `דרושה מנהלת חשבונות סוג 3 לחברת הייטק צומחת בתל אביב.
+דרישות:
+• ניסיון של 3 שנים לפחות בהנהלת חשבונות, כולל סגירות חודשיות והתאמות בנקים
+• שליטה ב-Priority וב-Excel ברמה גבוהה
+• יתרון משמעותי לניסיון בבניית אוטומציות ולהיכרות עם כלי AI
+• משרה מלאה, אפשרות להיברידי`;
+const EXAMPLES = [
+  { label: 'מנהלת חשבונות סוג 3 · הייטק', q: DEMO_JD, kind: 'all' },
+  { label: 'חשבת שכר במלונאות', q: 'מחפשים חשבת שכר לרשת מלונות גדולה, ניסיון עם חילן והיכרות עם דיני עבודה. עדיפות לאזור הצפון.', kind: 'all' },
+  { label: 'מנטורית לחשבת שכר בהסבה', q: 'מנטורית בכירה שתוכל ללוות חשבת שכר בהסבה מקצועית באיזור ירושלים, עם יכולות הדרכה.', kind: 'mentor' },
+];
+VIEWS.match = () => {
+  main().innerHTML = `
+  <div class="ph"><div><h2>התאמה חכמה</h2><div class="sub">הדביקי תיאור משרה או כתבי כמה מילים. המערכת תזהה תגיות, תחפש בכל הפרופילים והפגישות ותדרג את ההתאמות הטובות ביותר.</div></div></div>
+  <div class="card">
+    <textarea class="f" id="mq" rows="6" placeholder="לדוגמה: דרושה חשבת שכר לחברת מלונאות באילת, ניסיון בחילן…">${esc(M.q)}</textarea>
+    <div class="row between mt">
+      <div class="row ex"><span class="muted sm">נסי לדוגמה:</span>${EXAMPLES.map((e, i) => `<button class="btn sm ghost" data-act="m-ex" data-i="${i}">${esc(e.label)}</button>`).join('')}</div>
+      <button class="btn" data-act="m-run">${ICON.spark} חיפוש התאמות</button>
+    </div>
+  </div>
+  <div id="mbody"></div>`;
+  $('#mq').oninput = e => { M.q = e.target.value; };
+  $('#mq').onkeydown = e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); doMatch(); } };
+  drawMatch();
+};
+function doMatch() {
+  M.q = $('#mq')?.value ?? M.q;
+  if (!M.q.trim()) { toast('כתבי כמה מילים או הדביקי תיאור משרה'); return; }
+  M.sel = detectTags(M.q).map(id => ({ id, must: false }));
+  M.ran = true; M.ai = null; drawMatch();
+  $('#mbody')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function drawMatch() {
+  const box = $('#mbody'); if (!box) return;
+  if (!M.ran) { box.innerHTML = `<div class="card mt"><div class="empty">✿ התוצאות יופיעו כאן: רשימה מדורגת עם אחוז התאמה, התגיות שתואמות, מה חסר, וקטע רלוונטי מהפגישות.</div></div>`; return; }
+  const res = runMatch(M.q, M.sel, M.kind);
+  const kinds = [['all', 'הכול'], ...Object.entries(KINDS).map(([k, v]) => [k, v.plural])];
+  let ordered = res, aiCard = '';
+  if (M.ai && res.length) {
+    const by = new Map(res.map(r => [r.p.id, r]));
+    const top = M.ai.ranking.filter(a => by.has(a.id)).sort((a, b) => b.score - a.score).map(a => ({ ...by.get(a.id), ai: a }));
+    const seen = new Set(top.map(t => t.p.id));
+    ordered = [...top, ...res.filter(r => !seen.has(r.p.id)).map(r => ({ ...r, aiOut: true }))];
+    aiCard = `<div class="card ai-note" style="margin-top:14px">✨ <b>דירוג AI:</b> ${esc(M.ai.overview) || 'הדירוג מוכן.'}</div>`;
+  }
+  const aiBtn = !res.length ? '' : aiOn()
+    ? `<button class="btn" data-act="m-ai">${ICON.spark} ${M.ai ? 'דירוג AI מחדש' : 'דירוג חכם עם AI'}</button>`
+    : `<a class="link" href="#backup" style="text-decoration:none">✨ הפעלת דירוג AI בהגדרות</a>`;
+  box.innerHTML = `
+  <div class="card mt">
+    <div class="row between"><h3 class="mt0" style="margin:0">מה חיפשנו</h3><div class="seg" id="mkind">${kinds.map(([k, l]) => `<button data-v="${k}" class="${M.kind === k ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+    <div class="hint" style="margin:8px 0 12px">התגיות זוהו אוטומטית מהטקסט. לחיצה על תגית מסמנת אותה כ<b>חובה ★</b> (למשל איזור), ו-× מסירה אותה.</div>
+    <div class="tags">${M.sel.map(x => { const t = TAGMAP.get(x.id); return t ? `<span class="tag c-${catOf(t.cat).color} click ${x.must ? 'must' : ''}" data-act="m-must" data-id="${t.id}" title="לחיצה: חובה / רשות">${x.must ? '★ ' : ''}#${esc(t.label)}<button class="x" data-act="m-rm" data-id="${t.id}" aria-label="הסרה">×</button></span>` : ''; }).join('') || '<span class="muted sm">לא זוהו תגיות. החיפוש יתבסס על מילים מהטקסט בלבד.</span>'}</div>
+    <div id="madd" class="mt" style="max-width:460px"></div>
+  </div>
+  <div class="row between" style="margin-top:28px"><h3 class="sec" style="margin:0">${res.length ? `נמצאו ${res.length} התאמות` : 'לא נמצאו התאמות'}</h3>${aiBtn}</div>
+  ${aiCard}
+  ${res.length ? ordered.map((r, i) => resultCard(r, i)).join('') : '<div class="card mt"><div class="empty">נסי להסיר תגיות חובה ★ או לשנות את הסינון 🌸</div></div>'}`;
+  $$('#mkind button').forEach(b => b.onclick = () => { M.kind = b.dataset.v; M.ai = null; drawMatch(); });
+  mountTagPicker($('#madd'), { get: () => M.sel.map(x => x.id), set: v => { const cur = new Map(M.sel.map(x => [x.id, x])); M.sel = v.map(id => cur.get(id) || { id, must: false }); M.ai = null; drawMatch(); $('#madd .tp-in')?.focus(); }, showChips: false, allowCreate: false, placeholder: '+ הוספת תגית לחיפוש…' });
+}
+function resultCard(r, i) {
+  const p = r.p, ai = r.ai, pct = ai ? ai.score : Math.round(Math.min(1, r.score) * 100);
+  const rc = r.aiOut ? '#C9C1BC' : pct >= 70 ? 'var(--rose-d)' : pct >= 45 ? 'var(--gold)' : '#ABA29C';
+  const why = [
+    M.sel.length ? `התאמה ב-${r.hit.length} מתוך ${M.sel.length} תגיות` : '',
+    r.mw.length ? `מילים משותפות: ${[...new Set(r.mw.map(x => x.t.length >= 3 ? x.t : x.w))].slice(0, 5).join(', ')}` : '',
+    r.last ? `פגישה אחרונה ${relDate(r.last)}` : 'עדיין אין פגישות מתועדות',
+  ].filter(Boolean).join(' · ');
+  const snip = bestSnippet(p, r.mw);
+  return `<div class="card res ${i === 0 ? 'best' : ''} ${r.aiOut ? 'out' : ''}">
+    ${i === 0 ? `<span class="ribbon">${ai ? '✨ הבחירה של ה-AI' : 'ההתאמה הגבוהה ביותר'}</span>` : ''}
+    <div class="ring" style="--p:${pct};--rc:${rc}"><span>${pct}%</span></div>
+    <div>
+      <div class="row"><span class="nm">${esc(p.name)}</span>${kindPill(p.kind)}<span class="muted sm">${esc([p.role, p.company].filter(Boolean).join(' · '))}</span></div>
+      <div class="why">${ai ? esc(ai.reason) : r.aiOut ? 'ה-AI לא כלל ברשימת המתאימים · ' + why : why}</div>
+      <div class="tags">${r.hit.map(x => chip(x.id, { cls: x.must ? 'must' : '' })).join('')}${r.miss.map(x => { const t = TAGMAP.get(x.id); return t ? `<span class="tag miss" title="חסר בפרופיל">#${esc(t.label)}</span>` : ''; }).join('')}</div>
+      ${ai?.gaps ? `<div class="gaps"><b>כדאי לבדוק:</b> ${esc(ai.gaps)}</div>` : ''}
+      ${snip && !ai ? `<div class="snip">${snip}</div>` : ''}
+    </div>
+    <div class="acts">
+      <button class="btn sm soft" data-act="person" data-id="${p.id}">לפרופיל</button>
+      ${p.phone ? `<a class="btn sm ghost" href="tel:${esc(digits(p.phone))}">${ICON.phone} חיוג</a>` : ''}
+      ${p.email ? `<a class="btn sm ghost" href="mailto:${esc(p.email)}?subject=${encodeURIComponent('הזדמנות שיכולה להתאים לך')}">${ICON.mail} מייל</a>` : ''}
+    </div>
+  </div>`;
+}
+
+async function matchAI(btn) {
+  // The AI re-ranks the keyword search's top candidates; each profile carries the person's notes and recent meetings.
+  const res = runMatch(M.q, M.sel, M.kind).slice(0, 12);
+  if (!res.length) { toast('אין מועמדים לדירוג'); return; }
+  const done = busy(btn, 'ה-AI קורא את הפרופילים…');
+  try {
+    const cut = (s, n) => s.length > n ? s.slice(0, n) + '…' : s;
+    const profiles = res.map(({ p }) => {
+      const ms = meetingsOf(p.id).slice(0, 6);
+      return `[id: ${p.id}] ${p.name} | ${KINDS[p.kind]?.label || ''} | ${p.role || '-'} | ${p.company || '-'}
+Tags: ${sortTags(p.tags).map(id => TAGMAP.get(id).label).join(', ') || '-'}
+Notes: ${p.notes || '-'}
+Meetings (newest first):
+${ms.map(m => `- ${m.date} · ${m.title}: ${cut(m.text, 3000)}`).join('\n') || '-'}`;
+    }).join('\n\n---\n\n');
+    const must = M.sel.filter(x => x.must).map(x => TAGMAP.get(x.id)?.label).filter(Boolean);
+    const r = await aiJSON({ system: MATCH_SYSTEM, schema: MATCH_SCHEMA, format: MATCH_FORMAT, effort: 'medium',
+      text: `Request:\n${M.q.trim()}\n${must.length ? `\nShe marked these as hard requirements: ${must.join(', ')}\n` : ''}\nToday's date: ${todayISO()}\n\nCandidates (${res.length}):\n\n${profiles}` });
+    const ids = new Set(res.map(x => x.p.id));
+    M.ai = { overview: typeof r.overview === 'string' ? r.overview : '',
+      ranking: (Array.isArray(r.ranking) ? r.ranking : []).filter(a => a && ids.has(a.id)).map(a => ({ id: a.id, score: Math.max(0, Math.min(100, Math.round(+a.score || 0))), reason: String(a.reason || ''), gaps: String(a.gaps || '') })) };
+    drawMatch();
+  } catch (e) { console.error(e); toast(e.message || 'משהו השתבש בדירוג', 6000); }
+  finally { done(); }
+}
+
+/* ---------------- tags library ---------------- */
+VIEWS.tags = () => {
+  const tc = tagCounts();
+  main().innerHTML = `
+  <div class="ph"><div><h2>ספריית התגיות</h2><div class="sub">כל תגית מזוהה אוטומטית בטקסט לפי מילות מפתח. לחצי על תגית כדי לערוך את השם, הקטגוריה ומילות המפתח שלה. המספר מציין כמה אנשים מתויגים בה.</div></div>
+    <button class="btn" data-act="tag-new" data-cat="other">${ICON.plus} תגית חדשה</button></div>
+  <div class="grid g2">${CATS.map(c => { const ts = S.tags.filter(t => t.cat === c.id).sort((a, b) => a.label.localeCompare(b.label, 'he')); return `
+    <div class="card"><div class="row between" style="margin-bottom:12px"><h3 style="margin:0"><span class="dot c-${c.color}"></span> ${c.name}</h3><button class="btn sm ghost" data-act="tag-new" data-cat="${c.id}">+ הוספה</button></div>
+    <div class="tags">${ts.map(t => chip(t.id, { count: tc.get(t.id) || 0, act: 'tag-edit' })).join('') || '<span class="muted sm">אין עדיין תגיות בקטגוריה הזו</span>'}</div></div>`; }).join('')}</div>`;
+};
+function openTagForm(t, cat) {
+  const isNew = !t;
+  const d = t || { label: '', cat: cat || 'other', kw: [] };
+  const m = openModal(`<button class="close" data-act="close" aria-label="סגירה">×</button>
+    <h2 class="mh">${isNew ? 'תגית חדשה' : 'עריכת תגית'}</h2>
+    <div class="field"><label class="l">שם התגית</label><input class="f" id="tl" value="${esc(d.label)}" placeholder="לדוגמה: רקע אנרגיה"></div>
+    <div class="field"><label class="l">קטגוריה</label><select class="f" id="tc">${CATS.map(c => `<option value="${c.id}" ${c.id === d.cat ? 'selected' : ''}>${c.name}</option>`).join('')}</select></div>
+    <div class="field"><label class="l">מילות מפתח לזיהוי אוטומטי <small>· מופרדות בפסיק</small></label>
+      <textarea class="f" id="tk" rows="3" placeholder="לדוגמה: אנרגיה, חשמל, אנרגיה סולארית">${esc((d.kw || []).filter(k => !k.startsWith('re:')).join(', '))}</textarea>
+      <div class="hint">כשאחת מהמילים מופיעה בסיכום פגישה או בתיאור משרה, התגית תוצע אוטומטית. השם עצמו נחשב תמיד.</div></div>
+    <div class="row between mt">${isNew ? '<span></span>' : `<button class="btn danger" id="tdel">${ICON.trash} מחיקת התגית</button>`}
+      <div class="row"><button class="btn ghost" data-act="close">ביטול</button><button class="btn" id="tsave">${ICON.check} שמירה</button></div></div>`);
+  $('#tsave', m).onclick = () => {
+    const label = $('#tl', m).value.trim().replace(/^#/, '');
+    if (!label) { toast('נא למלא שם לתגית'); return; }
+    const kw = $('#tk', m).value.split(/[,،\n]/).map(s => s.trim()).filter(Boolean);
+    const obj = t || { id: uid() };
+    obj.label = label; obj.cat = $('#tc', m).value;
+    obj.kw = [...(t?.kw || []).filter(k => k.startsWith('re:')), ...kw];
+    if (isNew) S.tags.push(obj);
+    reindexTags(); save(); closeAll(); toast('התגית נשמרה ✓');
+  };
+  if (!isNew) $('#tdel', m).onclick = async () => {
+    const n = S.people.filter(p => p.tags.includes(t.id)).length;
+    if (!await confirmBox(`למחוק את התגית #${esc(t.label)}?${n ? `<br><small class="muted">היא תוסר מ-${n} אנשים.</small>` : ''}`)) return;
+    S.tags = S.tags.filter(x => x.id !== t.id);
+    S.people.forEach(p => p.tags = p.tags.filter(x => x !== t.id));
+    S.meetings.forEach(mm => mm.tags = (mm.tags || []).filter(x => x !== t.id));
+    reindexTags(); save(); closeAll(); toast('התגית נמחקה');
+  };
+  setTimeout(() => $('#tl', m)?.focus(), 60);
+}
+
+/* ---------------- settings ---------------- */
+VIEWS.backup = () => {
+  const size = Math.round(JSON.stringify(S).length / 1024);
+  main().innerHTML = `
+  <div class="ph"><div><h2>גיבוי והגדרות</h2><div class="sub">${CLOUD ? 'המידע נשמר בחשבון Claude שלך ומסונכרן בין המכשירים שלך. עדיין מומלץ לייצא גיבוי מדי פעם.' : 'כל המידע נשמר מקומית בדפדפן במכשיר הזה בלבד. מומלץ לייצא גיבוי מדי פעם.'}</div></div></div>
+  <div class="grid g2">
+    <div class="card"><h3>${ICON.download} גיבוי ושחזור</h3>
+      <p class="muted">ייצוא יוצר קובץ אחד עם כל האנשים, הפגישות, הצרופות והתגיות. אפשר לשחזר ממנו בכל מחשב.</p>
+      <p class="sm muted">כרגע: ${S.people.length} אנשים · ${S.meetings.length} פגישות · ${S.tags.length} תגיות · כ-${size.toLocaleString('he-IL')} KB</p>
+      <div class="row"><button class="btn" data-act="export">${ICON.download} ייצוא גיבוי</button><button class="btn ghost" data-act="import">${ICON.upload} שחזור מגיבוי</button><input type="file" id="impfile" accept=".json,application/json" hidden></div>
+    </div>
+    <div class="card"><h3>✿ נתוני הדוגמה</h3>
+      <p class="muted">המערכת נטענה עם אנשים ופגישות לדוגמה (בדויים) כדי שיהיה קל להתרשם. כשמתחילות לעבוד באמת, אפשר למחוק הכל ולהתחיל נקי. התגיות נשמרות.</p>
+      <div class="row"><button class="btn danger" data-act="wipe">התחלה נקייה (מחיקת האנשים והפגישות)</button><button class="btn ghost" data-act="demo-reset">טעינת הדוגמה מחדש</button></div>
+    </div>
+    ${HOSTED ? hostedCards() : `<div class="card"><h3>${ICON.spark} ניתוח ודירוג עם AI</h3>
+      <p class="muted">עם מפתח API של Anthropic המערכת קוראת צילומי מסך, מסכמת פגישות, ממלאת פרטים ותגיות, ומדרגת התאמות לפי משמעות עם הסבר כתוב לכל מועמד/ת.</p>
+      <div class="note ${aiOn() ? 'ok' : ''}">${aiOn() ? '✓ ה-AI פעיל במכשיר הזה' : 'ה-AI כבוי. המערכת עובדת גם בלעדיו.'}</div>
+      <div class="field"><label class="l">מפתח API <small>· נשמר רק במכשיר הזה ולא נכלל בגיבוי</small></label><input class="f" id="aikey" type="password" dir="ltr" autocomplete="off" placeholder="${aiOn() ? '•••••••• (שמור)' : 'sk-ant-…'}"></div>
+      <div class="field"><label class="l">מודל</label><select class="f" id="aimodel">${AI_MODELS.map(([id, l]) => `<option value="${id}" ${id === AI.model ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
+      <div class="row"><button class="btn" data-act="ai-save">${ICON.check} שמירה</button><button class="btn ghost" data-act="ai-test">בדיקת חיבור</button>${aiOn() ? '<button class="btn ghost" data-act="ai-clear">הסרת המפתח</button>' : ''}</div>
+      <div class="hint">את המפתח מפיקים ב-Claude Console (<span dir="ltr">platform.claude.com</span>). התשלום הוא לפי שימוש, ישירות ל-Anthropic.</div>
+    </div>
+    <div class="card"><h3>📱 התקנה בטלפון</h3>
+      <p class="muted">כשהמערכת נפתחת מכתובת אינטרנט, אפשר להוסיף אותה למסך הבית. היא תיפתח במסך מלא כמו אפליקציה, ותעבוד גם בלי אינטרנט (חוץ מה-AI).</p>
+      <ul class="muted" style="margin:0 0 12px;padding-inline-start:20px;line-height:1.9">
+        <li><b>iPhone:</b> לפתוח ב-Safari, כפתור השיתוף, ואז "הוספה למסך הבית"</li>
+        <li><b>Android:</b> לפתוח ב-Chrome, תפריט ⋮, ואז "התקנת האפליקציה"</li>
+      </ul>
+      ${INSTALL_EVT ? `<button class="btn" data-act="install">${ICON.download} התקנה עכשיו</button>` : ''}
+      <div class="hint">${isStandalone() ? '✓ פועלת עכשיו כאפליקציה מותקנת' : location.protocol === 'file:' ? 'כרגע הקובץ נפתח ישירות מהמחשב. להתקנה בטלפון צריך להעלות את תיקיית האפליקציה לאחסון באינטרנט.' : 'כל מכשיר שומר את המידע שלו. להעברה בין מחשב לטלפון: ייצוא גיבוי במכשיר אחד ושחזור בשני.'}</div>
+    </div>
+    <div class="card" style="grid-column:1/-1"><h3>🔒 פרטיות</h3>
+      <p class="muted" style="margin:0">המידע נשמר רק במכשיר הזה ולא בשום שרת. בלי AI שום דבר לא יוצא מהמכשיר: זיהוי הטקסט מתמונות רץ בתוך הדפדפן. כשה-AI פעיל, התוכן שאת מנתחת (טקסט ותמונות של פגישה, או תיאור המשרה והפרופילים של המועמדים המובילים בדירוג) נשלח ל-Anthropic לצורך העיבוד. ניקוי נתוני הדפדפן או הסרת האפליקציה ימחקו את המידע, ולכן חשוב לייצא גיבוי מדי פעם.</p>
+    </div>`}
+  </div>`;
+  $('#impfile').onchange = async e => {
+    const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+    try {
+      const data = JSON.parse(await f.text());
+      if (!Array.isArray(data.people) || !Array.isArray(data.tags) || !Array.isArray(data.meetings)) throw new Error('bad');
+      if (!await confirmBox('לשחזר מהגיבוי? המידע הנוכחי יוחלף.', 'שחזור')) return;
+      S = data; reindexTags(); save(); render(); toast('השחזור הושלם ✓');
+    } catch (err) { toast('הקובץ אינו גיבוי תקין של מעגל'); }
+  };
+};
+function hostedCards() {   // settings cards shown when the page runs as a Claude artifact
+  return `<div class="card"><h3>${ICON.spark} ניתוח ודירוג עם AI</h3>
+      <p class="muted">ה-AI מובנה כאן ופועל דרך חשבון Claude שלך, בלי מפתח ובלי הגדרות. הוא קורא צילומי מסך, מסכם פגישות, ממלא פרטים ותגיות, ומדרג התאמות לפי משמעות עם הסבר כתוב.</p>
+      <div class="note ${SAMPLE ? 'ok' : ''}" style="margin:0">${SAMPLE ? '✓ ה-AI זמין. בשימוש הראשון תתבקשי לאשר אותו.' : 'ה-AI לא זמין בתצוגה הזו. שאר המערכת עובדת כרגיל.'}</div>
+    </div>
+    <div class="card"><h3>☁️ שמירה וסנכרון</h3>
+      <p class="muted" style="margin:0">${CLOUD
+        ? 'המידע נשמר באזור פרטי בחשבון Claude שלך וזמין בכל מכשיר שבו את מחוברת לחשבון: מחשב, טלפון או טאבלט. צילומי המסך עצמם לא נשמרים, רק הטקסט שנקרא מהם.'
+        : 'כרגע המידע נשמר רק בדפדפן במכשיר הזה. כדי שיישמר בחשבון ויסתנכרן בין מכשירים, צריך להיות מחוברת ל-Claude ולקבל בעמוד הזה הרשאת שיתוף שמאפשרת שמירה (Contributor ומעלה).'}</p>
+    </div>
+    <div class="card" style="grid-column:1/-1"><h3>🔒 פרטיות</h3>
+      <p class="muted" style="margin:0">${CLOUD ? 'לפי הגדרות העמוד, המידע שלך גלוי רק לך, גם לא למי ששיתף איתך את העמוד.' : 'המידע נשמר רק במכשיר הזה.'} כשאת משתמשת ב-AI, התוכן של אותה פעולה (טקסט ותמונות של פגישה, או תיאור המשרה והפרופילים המובילים בדירוג) נשלח ל-Claude לעיבוד, על חשבון השימוש שלך. מומלץ לייצא גיבוי מדי פעם.</p>
+    </div>`;
+}
+let INSTALL_EVT = null;
+const isStandalone = () => window.matchMedia?.('(display-mode: standalone)').matches || navigator.standalone === true;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); INSTALL_EVT = e; if (ROUTE === 'backup') render(); });
+window.addEventListener('appinstalled', () => { INSTALL_EVT = null; toast('מעגל הותקנה במכשיר ✿'); });
+async function exportData() {
+  const name = `maagal-backup-${todayISO()}.json`;
+  const blob = new Blob([JSON.stringify(S)], { type: 'application/json' });
+  if (HOSTED) {   // inside a Claude artifact a page cannot download by itself; the viewer confirms the save
+    if (!DOWNLOADS) { toast('שמירת קובץ לא זמינה בתצוגה הזו. נסי לפתוח את העמוד בדפדפן במחשב.', 5000); return; }
+    try { await DOWNLOADS.save({ filename: name, data: JSON.stringify(S) }); toast('קובץ הגיבוי נשמר ✓'); }
+    catch (e) { if (e?.code !== 'declined') toast(e?.code === 'host_unavailable' ? 'האפליקציה הזו לא יכולה לשמור קבצים. נסי מדפדפן במחשב.' : 'שמירת הגיבוי לא הצליחה. נסי שוב.', 5000); }
+    return;
+  }
+  // On phones, hand the file to the share sheet (save to Files / Drive, or send to yourself).
+  if (window.matchMedia?.('(pointer: coarse)').matches && navigator.canShare) {
+    try {
+      const file = new File([blob], name, { type: 'application/json' });
+      if (navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: 'גיבוי מעגל' }); return; }
+    } catch (e) { if (e?.name === 'AbortError') return; }
+  }
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
+  toast('קובץ הגיבוי נוצר ✓');
+}
+
+/* ================= global click actions ================= */
+const ACT = {
+  'person': a => openPerson(a.dataset.id),
+  'close': () => closeTop(),
+  'new-person': () => openPersonForm(null),
+  'edit-person': a => openPersonForm(S.people.find(p => p.id === a.dataset.id)),
+  'del-person': async a => {
+    const p = S.people.find(x => x.id === a.dataset.id); if (!p) return;
+    const n = S.meetings.filter(m => m.personId === p.id).length;
+    if (!await confirmBox(`למחוק את ${esc(p.name)} מהמעגל?${n ? `<br><small class="muted">גם ${n} הפגישות שלה/שלו יימחקו.</small>` : ''}`)) return;
+    S.people = S.people.filter(x => x.id !== p.id); S.meetings = S.meetings.filter(m => m.personId !== p.id);
+    save(); closeAll(); toast('נמחק/ה מהמעגל');
+  },
+  'add-meeting': a => { resetIntake(); I.personMode = 'existing'; I.personId = a.dataset.id; navigate('intake'); },
+  'del-meeting': async a => {
+    const m = S.meetings.find(x => x.id === a.dataset.id); if (!m) return;
+    if (!await confirmBox(`למחוק את הפגישה "${esc(m.title)}"?`)) return;
+    S.meetings = S.meetings.filter(x => x.id !== m.id); save();
+    const box = $('#modal-root .modal'); const p = S.people.find(x => x.id === m.personId);
+    if (box && p) drawPerson(p, box);
+  },
+  'expand': a => { const t = a.closest('.tli'); const open = t.classList.toggle('open'); a.textContent = open ? 'הצגה מקוצרת ▴' : 'הצגת הכל ▾'; },
+  'img-view': a => { const m = S.meetings.find(x => x.id === a.dataset.mid); const at = m?.attachments?.[+a.dataset.i]; if (at) openModal(`<button class="close" data-act="close" aria-label="סגירה">×</button><img src="${at.dataUrl}" alt="${esc(at.name)}">`, { stack: true, cls: 'img' }); },
+  'filter-tag': a => { P.tags = [a.dataset.tag]; P.q = ''; P.kind = 'all'; navigate('people'); },
+  'demo-load': () => { const d = freshState(true); S.people = d.people; S.meetings = d.meetings; reindexTags(); save(); render(); toast('נתוני הדוגמה נטענו. אפשר למחוק אותם במסך ההגדרות.', 4500); },
+  'intake-analyze': () => analyzeIntake(),
+  'intake-save': () => saveIntake(),
+  'intake-clear': () => { resetIntake(true); render(); },
+  'intake-demo': () => {
+    const dt = new Date(); const ds = `${pad(dt.getDate())}/${pad(dt.getMonth() + 1)}/${dt.getFullYear()}`;
+    setIntakeText(`מאת: קרן אלון <keren.alon@example.com>
+נושא: תודה על השיחה היום!
+תאריך: ${ds}
+
+היי, רציתי להגיד תודה על השיחה המעצימה 🙏
+כמו שסיפרתי, אני רואת חשבון עם 3 שנות ניסיון במשרד רו"ח (ביקורת של חברות נדל"ן), וגרה בנתניה.
+אני מחפשת עבודה מחוץ למשרד. הכי מעניין אותי תפקיד של חשבת או קונטרולרית בחברת הייטק.
+שולטת ב-Excel ברמה גבוהה, ולאחרונה התחלתי ללמוד Power BI ולעבוד עם כלי AI.
+אשמח אם תכירי לי אנשים מהתחום.
+
+קרן · 054-555-0108`);
+    I.type = 'מייל'; const s = $('#itype'); if (s) s.value = I.type;
+    analyzeIntake();
+  },
+  'file-rm': a => { I.files = I.files.filter(f => f.id !== a.dataset.id); drawFiles(); },
+  'm-run': () => doMatch(),
+  'm-ex': a => { const e = EXAMPLES[+a.dataset.i]; M.q = e.q; M.kind = e.kind; const t = $('#mq'); if (t) t.value = e.q; doMatch(); },
+  'm-must': a => { const x = M.sel.find(s => s.id === a.dataset.id); if (x) { x.must = !x.must; M.ai = null; drawMatch(); } },
+  'm-rm': a => { M.sel = M.sel.filter(s => s.id !== a.dataset.id); M.ai = null; drawMatch(); },
+  'm-ai': a => matchAI(a),
+  'intake-ai': a => analyzeIntakeAI(a),
+  'sug-tag': a => {
+    const label = I.newTagSug[+a.dataset.i]; if (!label) return;
+    const t = { id: uid(), cat: 'other', label, kw: [] }; S.tags.push(t); reindexTags(); save();
+    I.tags = sortTags([...I.tags, t.id]); I.newTagSug = I.newTagSug.filter(l => l !== label); drawIntakeResult();
+  },
+  'ai-save': async () => {
+    const k = $('#aikey').value.trim();
+    if (!k && !aiOn()) { toast('הדביקי את מפתח ה-API בשדה'); return; }
+    AI = { key: k || AI.key, model: $('#aimodel').value };
+    const ok = DB.db ? await DB.set('ai', AI) : false;
+    render(); toast(ok ? 'הגדרות ה-AI נשמרו ✓' : 'ה-AI הופעל, אבל הדפדפן לא מאפשר לשמור את המפתח', 4000);
+  },
+  'ai-test': async a => {
+    const k = $('#aikey').value.trim(); if (k) AI = { ...AI, key: k }; AI.model = $('#aimodel').value;
+    if (!aiOn()) { toast('הדביקי קודם את מפתח ה-API'); return; }
+    const done = busy(a, 'בודק…');
+    try {
+      await claudeApi({ system: 'Connection check.', content: [{ type: 'text', text: 'Reply with ok set to true.' }], effort: 'low',
+        schema: { type: 'object', additionalProperties: false, required: ['ok'], properties: { ok: { type: 'boolean' } } } });
+      if (DB.db) await DB.set('ai', AI);
+      toast('החיבור ל-AI תקין ✓'); render();
+    } catch (e) { toast(e.message, 6000); done(); }
+  },
+  'ai-clear': async () => { AI = { key: '', model: AI.model }; if (DB.db) await DB.set('ai', AI); render(); toast('המפתח הוסר מהמכשיר'); },
+  'install': async () => { if (!INSTALL_EVT) return; INSTALL_EVT.prompt(); try { await INSTALL_EVT.userChoice; } catch (e) {} INSTALL_EVT = null; render(); },
+  'tag-edit': a => openTagForm(TAGMAP.get(a.dataset.tag)),
+  'tag-new': a => openTagForm(null, a.dataset.cat),
+  'export': () => exportData(),
+  'import': () => $('#impfile').click(),
+  'wipe': async () => { if (!await confirmBox('למחוק את כל האנשים והפגישות ולהתחיל נקי?<br><small class="muted">הפעולה אינה הפיכה. מומלץ לייצא גיבוי לפני.</small>')) return; S.people = []; S.meetings = []; save(); render(); toast('המעגל מוכן להתחלה חדשה ✿'); },
+  'demo-reset': async () => { if (!await confirmBox('לטעון מחדש את נתוני הדוגמה?<br><small class="muted">כל המידע הנוכחי יוחלף.</small>', 'טעינה')) return; S = freshState(true); reindexTags(); save(); render(); toast('נתוני הדוגמה נטענו'); },
+};
+document.addEventListener('click', e => {
+  const link = e.target.closest('a[href^="#"]');
+  if (link) { e.preventDefault(); navigate(link.getAttribute('href').slice(1)); return; }
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const fn = ACT[a.dataset.act]; if (!fn) return;
+  if (a.tagName !== 'A' || !a.getAttribute('href')) e.preventDefault();
+  e.stopPropagation(); fn(a, e);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#modal-root').children.length) closeTop(); });
+window.addEventListener('dragover', e => e.preventDefault());
+window.addEventListener('drop', e => e.preventDefault());
+window.addEventListener('paste', e => {
+  if (ROUTE !== 'intake' || $('#modal-root').children.length) return;
+  const imgs = [...(e.clipboardData?.files || [])].filter(f => f.type.startsWith('image/'));
+  if (imgs.length) { e.preventDefault(); addFiles(imgs); toast('צילום המסך נוסף, מזהה טקסט…'); }
+});
+window.addEventListener('hashchange', () => { const r = hashRoute(); if (r !== ROUTE) { closeAll(); render(r); } });
+
+/* ================= demo data (fictional) ================= */
+function freshState(withDemo) {
+  const st = { v: 1, tags: DEF_TAGS.map(([cat, label, kw], i) => ({ id: 't' + i, cat, label, kw })), people: [], meetings: [] };
+  if (withDemo) seedDemo(st);
+  return st;
+}
+function seedDemo(st) {
+  const prev = S; S = st; reindexTags();
+  const byLabel = Object.fromEntries(st.tags.map(t => [t.label, t.id]));
+  const T = arr => arr.map(l => { if (!byLabel[l]) console.warn('missing tag', l); return byLabel[l]; }).filter(Boolean);
+  const people = [
+    ['נועה לוי','mentee','מנהלת חשבונות סוג 3','סייברליין בע"מ','054-555-0141','noa.levi@example.com','רוצה להתקדם לתפקיד חשבת בתוך שנתיים. חזקה מאוד באקסל, בנתה לבד אוטומציות לסגירת החודש.',2,
+      ['מנהל/ת חשבונות','מנהל/ת חשבונות סוג 3','רקע הייטק','איזור מרכז','Priority','Excel מתקדם','סגירות חודשיות ורבעוניות','התאמות בנקים','אוטומציות','AI','מנוסה','מחפש/ת עבודה באופן פעיל']],
+    ['מאיה כהן','mentee','חשבת שכר','מלון חוף הכרמל','052-555-0187','maya.cohen@example.com','6 שנות ניסיון כחשבת שכר במלונאות. מכירה לעומק את חילן ומיכפל. רוצה לעבור לחברה גדולה ויציבה יותר.',9,
+      ['חשב/ת שכר','רקע מלונאות','איזור צפון','חילן','מיכפל','דיני עבודה','מנוסה','פתוח/ה להצעות','משרה מלאה']],
+    ['דנה אברהם','mentee','רואת חשבון, מנהלת ביקורת','משרד רו"ח, רמת גן','050-555-0113','dana.a@example.com','רו"ח עם 5 שנים בביקורת. רוצה לצאת מהמשרד לתעשייה, חולמת על תפקיד קונטרולרית בפארמה.',-2,
+      ['רו"ח','רקע משרד רו"ח','רקע פארמה','IFRS','דוחות כספיים','אנגלית ברמה גבוהה','איזור מרכז','מנוסה','פתוח/ה להצעות']],
+    ['שירה מזרחי','mentee','כלכלנית','','054-555-0199','shira.m@example.com','בוגרת כלכלה וחשבונאות. חזקה בניתוח נתונים, Power BI ו-SQL, ומשתמשת ב-AI כמעט בכל משימה.',5,
+      ['כלכלן/ית','אנליסט/ית פיננסי/ת','בוגר/ת טרי/ה',"ג'וניור",'Power BI','SQL','ניתוח נתונים','מודלים פיננסיים','AI','איזור השרון','מחפש/ת עבודה באופן פעיל']],
+    ['רותם פרץ','mentee','מנהלת חשבונות סוג 2','','053-555-0124','rotem.p@example.com','חוזרת לשוק העבודה אחרי 3 שנים בבית עם הילדים. מעדיפה משרה חלקית קרוב לבאר שבע.',0,
+      ['מנהל/ת חשבונות','מנהל/ת חשבונות סוג 2','רקע נדל"ן','איזור דרום','חשבשבת','חזרה לשוק העבודה','משרה חלקית','מחפש/ת עבודה באופן פעיל']],
+    ['הילה ביטון','mentee','קונטרולרית','חברת מכשור רפואי','052-555-0156','hila.b@example.com','קונטרולרית בכירה, מובילה סגירות רבעוניות לפי US GAAP ו-SOX. שוקלת קפיצה לתפקיד סמנכ"לית כספים.',21,
+      ['קונטרולר/ית','רקע פארמה','US GAAP','SOX','SAP','דוחות כספיים','סגירות חודשיות ורבעוניות','ניהול צוות','אנגלית ברמה גבוהה','בכיר/ה','איזור מרכז','פתוח/ה להצעות']],
+    ['יעל גבאי','mentee','מנהלת חשבונות סוג 3','רשת מלונות, אילת','050-555-0172','yael.g@example.com','מנהלת חשבונות ספקים ברשת מלונות. עוברת לגור במרכז בינואר וזמינה מיידית לתפקיד חדש.',-1,
+      ['מנהל/ת חשבונות','מנהל/ת חשבונות סוג 3','רקע מלונאות','איזור דרום','איזור מרכז','Priority','הנהלת חשבונות ספקים','התאמות בנקים','משרה מלאה','זמין/ה מיידית','מחפש/ת עבודה באופן פעיל']],
+    ['ליאת שלום','mentee','חשבת שכר (בהסבה)','','054-555-0131','liat.s@example.com','הסבה מקצועית מהוראה. סיימה קורס חשבות שכר בהצטיינות. מחפשת משרה ראשונה, עדיף חלקית.',12,
+      ['חשב/ת שכר','הסבה מקצועית',"ג'וניור",'איזור ירושלים','Excel מתקדם','יכולות הדרכה','משרה חלקית','מחפש/ת עבודה באופן פעיל']],
+    ['אורית דהן','mentee','אנליסטית FP&A','סטארט-אפ פינטק','050-555-0165','orit.d@example.com','בונה מודלים ותחזיות, אוהבת אוטומציות ו-AI. רוצה תפקיד היברידי עם השפעה.',null,
+      ['אנליסט/ית פיננסי/ת','רקע סטארט-אפ','רקע הייטק','מודלים פיננסיים','Power BI','Excel מתקדם','אוטומציות','AI','היברידי','איזור מרכז','מנוסה']],
+    ['עומר חדד','mentee','מנהל חשבונות סוג 3','מפעל מזון, יקנעם','052-555-0119','omer.h@example.com','אחראי על תמחיר ומלאי ב-SAP. רוצה להתקדם לתפקיד חשב.',30,
+      ['מנהל/ת חשבונות','מנהל/ת חשבונות סוג 3','רקע תעשייה וייצור','רקע מזון','SAP','תמחיר ועלויות','סגירות חודשיות ורבעוניות','איזור צפון','מנוסה','פתוח/ה להצעות']],
+    ['מיכל רוזן','mentor','סמנכ"לית כספים','חברת סייבר ציבורית','050-555-0101','michal.r@example.com','CFO מנוסה בהייטק, ליוותה שני גיוסי הון. מוכנה ללוות מנטיות שרוצות להתקדם לניהול.',40,
+      ['סמנכ"ל/ית כספים','רקע הייטק','רקע סטארט-אפ','IFRS','ניהול צוות','ניהול תזרים','בכיר/ה','איזור מרכז','מוכן/ה לחנוך']],
+    ['אסתר נחום','mentor','רו"ח ויועצת מס','משרד עצמאי, חיפה','04-555-0177','esther.n@example.com','שותפה במשרד רו"ח בחיפה, מתמחה במיסוי. מגייסת מדי פעם מתמחות ומנהלות חשבונות.',14,
+      ['רו"ח','יועץ/ת מס','מיסוי','מע"מ ודיווחים','רקע משרד רו"ח','איזור צפון','בכיר/ה','מוכן/ה לחנוך']],
+    ['גלית אשכנזי','mentor','חשבת','משרד ממשלתי, ירושלים','02-555-0148','galit.a@example.com','חשבת במשרד ממשלתי, מומחית לתקציב ובקרה. נהנית ללוות נשים בהסבה מקצועית.',null,
+      ['חשב/ת','רקע ציבורי וממשלתי','תקציב ובקרה','איזור ירושלים','יכולות הדרכה','בכיר/ה','מוכן/ה לחנוך']],
+    ['רונית קפלן','mentor','סמנכ"לית כספים','רשת מלונות בדרום','08-555-0163','ronit.k@example.com','CFO של רשת מלונות. מכירה את עולם המלונאות באילת ובים המלח ויכולה לפתוח דלתות.',7,
+      ['סמנכ"ל/ית כספים','רקע מלונאות','איזור דרום','ניהול תזרים','ניהול צוות','בכיר/ה','מוכן/ה לחנוך']],
+    ['עידית ברק','contact','רכזת גיוס כספים וחשבונאות','חברת השמה','03-555-0190','idit.b@example.com','מגייסת בתחום הכספים. שולחת משרות פתוחות כל שבוע ומעדיפה לקבל 2–3 המלצות מסוננות.',1,
+      ['איזור מרכז','איזור השרון']],
+  ];
+  const ids = people.map(([name, kind, role, company, phone, email, notes, follow, tags]) => {
+    const p = { id: uid(), name, kind, role, company, phone, email, linkedin: '', notes, tags: sortTags(T(tags)), followUp: follow == null ? '' : daysAgo(-follow), created: Date.now() };
+    st.people.push(p); return p.id;
+  });
+  const meetings = [
+    [0, 6, 'שיחת זום / טלפון', 'הכנה לראיונות', `עברנו יחד על קורות החיים. הוספנו פסקה על האוטומציות שבנתה באקסל לסגירת החודש (חוסכות כ-10 שעות בחודש לצוות).
+נועה מחפשת עבודה באופן פעיל, מעדיפה הייטק במרכז.
+משימות: לשלוח לי גרסה מעודכנת עד יום ראשון, להתכונן לשאלות על התאמות בנקים ו-Priority.`],
+    [0, 41, 'פגישה פרונטלית', 'פגישת היכרות בבית קפה', `נועה, 4 שנים מנהלת חשבונות סוג 3 בחברת סייבר בתל אביב. אחראית על ספקים, סגירות חודשיות והתאמות. מרגישה שהגיעה לתקרת זכוכית.
+החלום: תפקיד חשבת בתוך שנתיים. סקרנית מאוד לגבי כלי AI.`],
+    [1, 12, 'שיחת זום / טלפון', 'בחינת אפשרויות מעבר', `מאיה עובדת 6 שנים כחשבת שכר במלון בחיפה, אחראית על 220 עובדים כולל משמרות ועובדים זרים. מכירה לעומק דיני עבודה.
+רוצה יציבות ושעות קבועות. פתוחה להצעות בצפון.
+לבדוק חיבור לאסתר נחום.`],
+    [2, 3, 'מייל', 'קורות חיים מעודכנים', `מאת: דנה אברהם
+נושא: קורות חיים מעודכנים
+
+היי! מצרפת את קורות החיים אחרי התיקונים שדיברנו עליהם. הדגשתי את הניסיון בביקורת של חברות פארמה ומכשור רפואי, ואת הדוחות הכספיים לפי IFRS. אשמח אם תוכלי להעביר לעידית.`],
+    [2, 28, 'פגישה פרונטלית', 'לצאת מהמשרד לתעשייה', `דנה, רו"ח עם 5 שנות ניסיון בביקורת. מרגישה שחיקה מעונת הדוחות ורוצה לעבור לתעשייה, כקונטרולרית או חשבת. אנגלית מצוינת.
+צריכה לעבוד על הצגה עצמית קצרה וממוקדת.`],
+    [3, 9, 'הודעת וואטסאפ', 'עדכון אחרי ראיון', `שירה: "היה ראיון מעולה בחברת ביטוח בנתניה! שאלו המון על Power BI ועל מודלים. אמרו שיחזרו אליי השבוע 🙏"
+לשלוח לה טיפים לראיון שני.`],
+    [3, 33, 'שיחת זום / טלפון', 'שיחת היכרות', `בוגרת טרייה בכלכלה וחשבונאות. חזקה מאוד בדאטה: SQL ו-Power BI. משתמשת ב-ChatGPT וב-Claude לבניית מודלים.
+מחפשת משרת ג'וניור של כלכלנית או אנליסטית בשרון או במרכז.`],
+    [4, 1, 'שיחת זום / טלפון', 'תוכנית חזרה לשוק העבודה', `רותם, מנהלת חשבונות סוג 2, עבדה 7 שנים בחברת יזמות נדל"ן לפני ההפסקה. חוששת שהידע לא מעודכן.
+סיכמנו: קורס רענון בחשבשבת וקורס סוג 3 בערבים, ובמקביל חיפוש משרה חלקית באזור באר שבע.
+להזכיר לה לעדכן את הלינקדאין.`],
+    [5, 15, 'פגישה פרונטלית', 'ארוחת צהריים: המסלול ל-CFO', `הילה מובילה צוות של 6 בחברת מכשור רפואי, אחראית על סגירות רבעוניות לפי US GAAP ועל SOX. עובדת ב-SAP.
+רוצה להיות סמנכ"לית כספים בתוך 3 שנים. המלצתי לחבר אותה למיכל רוזן.`],
+    [6, 4, 'צילום מסך', 'פרופיל לינקדאין', `יעל גבאי · מנהלת חשבונות סוג 3 · רשת מלונות, אילת
+Open to work · זמינה מיידית
+ניסיון: הנהלת חשבונות ספקים, התאמות, Priority
+עוברת למרכז בינואר`],
+    [6, 20, 'שיחת זום / טלפון', 'שיחת היכרות', `יעל עובדת 5 שנים ברשת מלונות באילת. בן הזוג קיבל עבודה בתל אביב והם עוברים למרכז.
+מחפשת עבודה באופן פעיל, משרה מלאה. מצוינת בעבודה מול ספקים.`],
+    [7, 10, 'פגישה פרונטלית', 'ייעוץ לקראת משרה ראשונה', `ליאת סיימה קורס חשבות שכר בהצטיינות אחרי 12 שנים בהוראה. חוששת מחוסר ניסיון.
+רעיון: לנצל את כישורי ההדרכה. משרה בחברת שכר שמלווה לקוחות.
+לחבר אותה לגלית אשכנזי בירושלים.`],
+    [8, 18, 'תמליל הקלטה', 'שיחה על הצעת עבודה', `אורית: קיבלתי הצעה מסטארט-אפ בהרצליה, אבל הם רוצים חמישה ימים במשרד.
+אני: מה הכי חשוב לך בשלב הזה?
+אורית: גמישות והשפעה. אני רוצה לבנות להם את כל מודל התחזיות ולהכניס אוטומציות.
+אני: אז בואי ננסה לנהל משא ומתן על מודל היברידי.`],
+    [9, 25, 'שיחת זום / טלפון', 'שיחת היכרות', `עומר, מנהל חשבונות סוג 3 במפעל מזון ביקנעם, 6 שנים. אחראי על תמחיר ומלאי ב-SAP ועל סגירות חודשיות.
+רוצה להתקדם לתפקיד חשב, פתוח להצעות בצפון.`],
+    [10, 8, 'פגישה פרונטלית', 'קפה עם מיכל', `מיכל שמחה ללוות 2 מנטיות חדשות ברבעון הקרוב, עדיף כאלה שמכוונות לניהול. הצעתי את הילה ביטון ואת דנה אברהם.
+מיכל מחפשת גם אנליסטית FP&A לצוות שלה. לבדוק את אורית!`],
+    [11, 50, 'שיחת זום / טלפון', 'תיאום מנטורינג', `אסתר מחפשת מנהלת חשבונות סוג 3 למשרד בחיפה, ומוכנה ללוות חשבת שכר שרוצה להרחיב לתחום המיסוי.`],
+    [12, 60, 'פגישה פרונטלית', 'היכרות במשרד', `גלית, חשבת במשרד ממשלתי. 20 שנה בתקציב ובקרה. מתנדבת בתוכנית הסבה לנשים וחזקה מאוד בהדרכה. מוכנה לקחת מנטית אחת או שתיים.`],
+    [13, 14, 'מייל', 'פותחים תפקיד חשבת שכר', `רונית: "פותחים תפקיד חשבת שכר לרשת המלונות שלנו: 350 עובדים, משמרות, עובדים זרים. עדיף מישהי עם ניסיון במלונאות. אפשר גם רילוקיישן לאילת עם הטבות."`],
+    [14, 2, 'מייל', 'משרות פתוחות השבוע', `עידית שלחה 3 משרות:
+1. מנהלת חשבונות סוג 3 בחברת הייטק בתל אביב (Priority, סגירות)
+2. כלכלנית ג'וניור בחברת ביטוח בנתניה
+3. קונטרולרית לחברת פארמה ברחובות (IFRS, אנגלית)
+לשלוח לה המלצות עד יום חמישי.`],
+  ];
+  meetings.forEach(([pi, ago, type, title, text], k) => st.meetings.push({ id: uid() + k, personId: ids[pi], date: daysAgo(ago), type, title, text, tags: detectTags(text), attachments: [], created: Date.now() - ago * 864e5 }));
+  S = prev;
+}
+
+/* ================= boot ================= */
+async function boot() {
+  $('#nav').innerHTML = NAV.map(([r, l, ic, s]) => `<a href="#${r}" data-r="${r}">${ICON[ic]}<span class="lbl">${l}</span><span class="lbl-s">${s}</span>${r === 'people' ? '<span class="badge"></span>' : ''}</a>`).join('');
+  main().innerHTML = '<div class="card"><div class="empty">✿ טוען את המעגל…</div></div>';
+  if (HOSTED) {
+    // Capabilities the Claude viewer grants this page; each one resolves null where it is not available.
+    const [db, user, sample, downloads] = await Promise.all(['db', 'user', 'sample', 'downloads'].map(n => Promise.resolve().then(() => window.claude.use(n)).catch(() => null)));
+    SAMPLE = sample || null; DOWNLOADS = downloads || null;
+    if (SAMPLE) SAMPLE_LIM = await SAMPLE.limits().catch(() => null);
+    if (db && user) { try { await cloudOpen(db, user); } catch (e) { console.error(e); CLOUD = null; } }
+  }
+  if (CLOUD) { if (!PENDING_SAVE) $('#savestate').textContent = 'נשמר ומסונכרן בחשבון שלך'; }
+  else await bootLocal();
+  updateNavBadges();
+  render(hashRoute());
+  if (HOSTED && !CLOUD) toast('המידע נשמר כרגע רק במכשיר הזה. פרטים במסך ההגדרות.', 6000);
+}
+async function bootLocal() {
+  const ok = await DB.open();
+  let st = ok ? await DB.get('state') : null;
+  const ai = ok ? await DB.get('ai') : null;
+  if (ai && typeof ai.key === 'string') AI = { key: ai.key, model: AI_MODELS.some(m => m[0] === ai.model) ? ai.model : AI.model };
+  try { navigator.storage?.persist?.(); } catch (e) {}
+  if (!HOSTED && 'serviceWorker' in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register('sw.js').catch(() => {});
+  const fresh = !st || !Array.isArray(st.tags);
+  S = fresh ? freshState(!HOSTED) : st;   // sample people are pre-loaded only outside an artifact; there the dashboard offers them
+  reindexTags();
+  if (ok) { if (fresh) save(); else $('#savestate').textContent = 'כל השינויים נשמרו במכשיר'; }
+  else { $('#savestate').textContent = 'הדפדפן חוסם שמירה מקומית'; toast('שימי לב: הדפדפן לא מאפשר שמירה – כדאי לפתוח בדפדפן רגיל (Chrome / Edge)'); }
+}
+boot();
+</script>
+</body>
+</html>
